@@ -1,6 +1,7 @@
 {
   "name": "tapetide-mcp",
-  "version": "1.0.2",
+  "version": "1.0.4",
+  "mcpName": "com.tapetide/stock-research-mcp",
   "description": "Tapetide Stock Research MCP Server — search, screen, and analyze all NSE/BSE stocks with 26 tools for quotes, financials, technicals, analyst ratings, forecasts, FII/DII flows, screener, and market insights. Works with Claude, ChatGPT, Cursor, Kiro, and any MCP client.",
   "type": "module",
   "bin": {
