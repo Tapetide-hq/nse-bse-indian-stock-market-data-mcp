@@ -29,6 +29,27 @@ https://mcp.tapetide.com/mcp
 
 Authentication happens automatically via Google OAuth.
 
+### Remote MCP with Token (Claude Code, VS Code, Kiro, Zed)
+
+Use a personal token instead of OAuth — no browser sign-in needed:
+
+1. Get a free token at [tapetide.com/settings/tokens](https://tapetide.com/settings/tokens)
+2. Add to your MCP config:
+
+```json
+{
+  "mcpServers": {
+    "tapetide": {
+      "type": "url",
+      "url": "https://mcp.tapetide.com/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_TOKEN_HERE"
+      }
+    }
+  }
+}
+```
+
 ### Local MCP (Claude Code, Codex, Cursor, Windsurf, VS Code, Gemini CLI, Antigravity, Kiro, OpenCode, or any stdio client)
 
 1. Get a free token at [tapetide.com/settings/tokens](https://tapetide.com/settings/tokens)
@@ -47,6 +68,26 @@ Authentication happens automatically via Google OAuth.
   }
 }
 ```
+
+## Authentication
+
+Tapetide MCP supports three authentication methods:
+
+| Method | How it works | Best for |
+|--------|-------------|----------|
+| **Google OAuth** | Browser sign-in, automatic token refresh | AI chat apps (Claude.ai, ChatGPT, Grok) |
+| **Personal Token (remote)** | `Authorization: Bearer tpt_rt_...` header | Code editors with URL support (VS Code, Kiro, Claude Code) |
+| **Personal Token (local)** | `TAPETIDE_TOKEN` env var | Local stdio MCP clients (Cursor, Windsurf, Claude Desktop) |
+
+Personal tokens work for both remote and local MCP. Generate one at [tapetide.com/settings/tokens](https://tapetide.com/settings/tokens).
+
+## Environment Variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `TAPETIDE_TOKEN` | Yes (local) | — | Personal API token (starts with `tpt_rt_`) |
+| `TAPETIDE_MCP_URL` | No | `https://mcp.tapetide.com` | Override remote server URL |
+| `TAPETIDE_DEBUG` | No | `0` | Set to `1` to enable debug logging to stderr |
 
 ## Tools
 
@@ -280,8 +321,23 @@ Authentication happens automatically via Google OAuth.
 
 ## Rate Limits
 
-- **Free tier**: 1,000 requests/hour, 4,000 requests/day
-- Rate limit headers included in every response
+- **Remote MCP (OAuth)**: 100 requests/hour, 1,000 requests/day
+- **Remote MCP (token)**: 1,000 requests/hour, 4,000 requests/day
+- **Local MCP (npm)**: 1,000 requests/hour, 4,000 requests/day
+- Rate limit headers included in every response: `X-RateLimit-Remaining`, `X-RateLimit-Limit`, `X-RateLimit-Reset`
+
+## Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| `Token refresh failed (401)` | Token is invalid or expired. Generate a new one at [tapetide.com/settings/tokens](https://tapetide.com/settings/tokens) |
+| `Token refresh failed (network error)` | Check your internet connection. The server needs to reach `mcp.tapetide.com` |
+| `Rate limit exceeded` | You've hit the free tier limit. Wait for the reset (shown in error message) or check usage at [tapetide.com/settings/tokens](https://tapetide.com/settings/tokens) |
+| Server not responding | Ensure Node.js 18+ is installed. Run `node --version` to check |
+| `TAPETIDE_TOKEN environment variable is required` | Add your token to the `env` section of your MCP config |
+| Slow first request | Normal — the server pre-authenticates on startup. Subsequent requests are fast |
+
+Enable debug logging for more details: set `TAPETIDE_DEBUG=1` in your env config.
 
 ## Links
 

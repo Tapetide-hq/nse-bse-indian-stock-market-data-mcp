@@ -21,6 +21,7 @@
 
 const MCP_URL = process.env.TAPETIDE_MCP_URL || "https://mcp.tapetide.com";
 const REFRESH_TOKEN = process.env.TAPETIDE_TOKEN;
+const DEBUG = process.env.TAPETIDE_DEBUG === "1";
 
 if (!REFRESH_TOKEN) {
   process.stderr.write(
@@ -34,24 +35,34 @@ if (!REFRESH_TOKEN) {
 
 let accessToken: string | null = null;
 let tokenExpiresAt = 0;
+let refreshPromise: Promise<void> | null = null;
 
 async function refreshAccessToken(): Promise<void> {
-  const res = await fetch(`${MCP_URL}/token`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      grant_type: "refresh_token",
-      refresh_token: REFRESH_TOKEN!,
-    }),
-  });
-  if (!res.ok) {
-    const body = await res.text().catch(() => "");
-    throw new Error(`Token refresh failed (${res.status}): ${body}`);
+  // Prevent concurrent refresh calls — share a single in-flight promise.
+  if (refreshPromise) return refreshPromise;
+  refreshPromise = (async () => {
+    const res = await fetch(`${MCP_URL}/token`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        grant_type: "refresh_token",
+        refresh_token: REFRESH_TOKEN!,
+      }),
+    });
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      throw new Error(`Token refresh failed (${res.status}): ${body}`);
+    }
+    const data = (await res.json()) as { access_token: string; expires_in: number };
+    accessToken = data.access_token;
+    // Refresh 5 min before expiry to avoid edge cases. Guard against very short TTLs.
+    tokenExpiresAt = Date.now() + Math.max(data.expires_in - 300, 0) * 1000;
+  })();
+  try {
+    await refreshPromise;
+  } finally {
+    refreshPromise = null;
   }
-  const data = (await res.json()) as { access_token: string; expires_in: number };
-  accessToken = data.access_token;
-  // Refresh 5 min before expiry to avoid edge cases.
-  tokenExpiresAt = Date.now() + (data.expires_in - 300) * 1000;
 }
 
 async function getAccessToken(): Promise<string> {
@@ -70,6 +81,10 @@ const REMOTE_TIMEOUT = 30_000; // 30s per request
 
 async function forwardToRemote(body: string): Promise<string> {
   const token = await getAccessToken();
+  const start = Date.now();
+  let method: string | undefined;
+  try { method = (JSON.parse(body) as { method?: string }).method; } catch { /* ignore */ }
+
   let res = await fetchWithTimeout(`${MCP_URL}/mcp`, {
     method: "POST",
     headers: { ...MCP_HEADERS, Authorization: `Bearer ${token}` },
@@ -87,13 +102,29 @@ async function forwardToRemote(body: string): Promise<string> {
     });
   }
 
+  // Warn when approaching rate limits.
+  const remaining = res.headers.get("X-RateLimit-Remaining");
+  if (remaining !== null) {
+    const rem = parseInt(remaining, 10);
+    if (rem === 0) {
+      const resetAt = res.headers.get("X-RateLimit-Reset");
+      process.stderr.write(`Warning: Rate limit exhausted. Resets at ${resetAt ? new Date(parseInt(resetAt, 10) * 1000).toISOString() : "unknown"}.\n`);
+    } else if (rem <= 10) {
+      process.stderr.write(`Warning: ${rem} requests remaining before rate limit.\n`);
+    }
+  }
+
   // Handle SSE responses — extract JSON-RPC messages from event stream.
   const contentType = res.headers.get("content-type") || "";
   if (contentType.includes("text/event-stream")) {
-    return extractJsonFromSSE(await res.text());
+    const result = extractJsonFromSSE(await res.text());
+    if (DEBUG) process.stderr.write(`[debug] ${method ?? "?"} → SSE ${res.status} (${Date.now() - start}ms)\n`);
+    return result;
   }
 
   const text = await res.text();
+
+  if (DEBUG) process.stderr.write(`[debug] ${method ?? "?"} → ${res.status} (${Date.now() - start}ms)\n`);
 
   // If the remote returned an HTTP error, wrap it as a JSON-RPC error
   // so the client can parse it properly.
@@ -127,19 +158,26 @@ function fetchWithTimeout(url: string, init: RequestInit): Promise<Response> {
 /**
  * Extract JSON-RPC message from an SSE stream.
  * SSE format: `event: message\ndata: {...}\n\n`
- * We return the last `data:` line as the JSON response.
+ * We collect all `data:` lines and return the last one that parses as valid JSON,
+ * which is the actual JSON-RPC response.
  */
 function extractJsonFromSSE(sse: string): string {
   const lines = sse.split("\n");
-  let lastData = "";
+  let lastValidJson = "";
   for (const line of lines) {
-    if (line.startsWith("data: ")) {
-      lastData = line.slice(6);
-    } else if (line.startsWith("data:")) {
-      lastData = line.slice(5);
+    const data = line.startsWith("data: ") ? line.slice(6) : line.startsWith("data:") ? line.slice(5) : null;
+    if (data === null) continue;
+    const trimmed = data.trim();
+    if (!trimmed) continue;
+    // Verify it's valid JSON before accepting it.
+    try {
+      JSON.parse(trimmed);
+      lastValidJson = trimmed;
+    } catch {
+      // Not JSON — skip (could be a keep-alive or partial event).
     }
   }
-  return lastData || sse;
+  return lastValidJson || sse;
 }
 
 // ── Response writing ──────────────────────────────────────────────────
