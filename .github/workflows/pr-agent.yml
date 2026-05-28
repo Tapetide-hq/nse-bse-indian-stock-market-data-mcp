@@ -1,0 +1,28 @@
+name: PR Agent
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+  issue_comment:
+
+jobs:
+  pr_agent_job:
+    if: ${{ github.event.sender.type != 'Bot' }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: read
+    name: Run PR Agent
+    steps:
+      - name: PR Agent action
+        id: pragent
+        uses: Codium-ai/pr-agent@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI.KEY: ${{ secrets.ANTHROPIC_KEY }}
+          OPENAI.API_BASE: "https://kiro-worker.kamero.workers.dev/v1"
+          CONFIG.MODEL: "openai/claude-opus-4.6"
+          CONFIG.MODEL_TURBO: "openai/claude-opus-4.6"
+          CONFIG.FALLBACK_MODELS: '["openai/claude-opus-4.6"]'
+          CONFIG.CUSTOM_MODEL_MAX_TOKENS: "1000000"

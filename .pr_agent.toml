@@ -1,0 +1,27 @@
+[config]
+model = "openai/claude-opus-4.6"
+model_turbo = "openai/claude-opus-4.6"
+fallback_models = ["openai/claude-opus-4.6"]
+custom_model_max_tokens = 1000000
+
+[pr_reviewer]
+extra_instructions = """\
+- Focus on MCP protocol correctness: proper tool definitions, input schemas, error responses
+- Check TypeScript type safety and proper async/await patterns
+- Verify API response handling and data transformation logic
+- Flag any hardcoded secrets or credentials
+"""
+num_code_suggestions = 4
+require_score_review = true
+require_tests_review = true
+require_estimate_effort_to_review = true
+require_security_review = true
+require_can_be_split_review = true
+
+[pr_description]
+generate_ai_title = true
+enable_pr_type = true
+publish_labels = true
+
+[pr_code_suggestions]
+num_code_suggestions = 4
