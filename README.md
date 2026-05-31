@@ -2,20 +2,20 @@
   <img src="https://assets.tapetide.com/logo.svg" alt="Tapetide" width="80" />
 </p>
 
-# Tapetide Stock Research MCP Server — Indian Stock Market Data for AI Assistants
+# Tapetide Stock Research MCP Server
 
-> Tapetide Stock Research MCP Server for Claude, ChatGPT, Cursor, Kiro, and any MCP-compatible AI agent. Search, screen, and analyze all NSE and BSE stocks with 26 tools covering quotes, financials, technicals, analyst ratings, forecasts, FII/DII flows, screener, and market insights.
+> Indian stock market data for AI assistants — search, screen, and analyze all NSE/BSE stocks with 34 tools covering quotes, financials, technicals, analyst ratings, forecasts, FII/DII flows, screener, portfolio tracking, watchlist, and market insights.
 
 [![npm](https://img.shields.io/npm/v/tapetide-mcp)](https://www.npmjs.com/package/tapetide-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
 
 ## What is this?
 
-Tapetide Stock Research MCP Server is a [Model Context Protocol](https://modelcontextprotocol.io/) server that gives AI assistants direct access to Indian stock market data. Ask your AI to look up any NSE/BSE stock, run a screener with 100+ filters, pull financials, check technical indicators, or get the latest FII/DII activity — all through natural language.
+A [Model Context Protocol](https://modelcontextprotocol.io/) server that gives AI assistants direct access to Indian stock market data. Ask your AI to look up any NSE/BSE stock, run a screener with 326+ fundamental filters or real-time technical indicators, pull financials, check analyst ratings, track your portfolio, or get the latest FII/DII activity — all through natural language.
 
-Works with Claude Desktop, ChatGPT, Cursor, Windsurf, Kiro, and any client that supports MCP.
+Works with Claude Desktop, ChatGPT, Cursor, Windsurf, Kiro, Claude Code, Codex, VS Code, Zed, Gemini, and any client that supports MCP.
 
-**[Learn more about Tapetide Stock Research MCP Server →](https://tapetide.com/mcp)**
+**[Learn more →](https://tapetide.com/mcp)**
 
 ## Quick Start
 
@@ -62,16 +62,26 @@ Use a personal token instead of OAuth — no browser sign-in needed:
       "command": "npx",
       "args": ["-y", "tapetide-mcp"],
       "env": {
-        "TAPETIDE_TOKEN": "get your free token from https://tapetide.com/settings/tokens"
+        "TAPETIDE_TOKEN": "your_token_here"
       }
     }
   }
 }
 ```
 
-## Authentication
+## How It Works
 
-Tapetide MCP supports three authentication methods:
+The local npm package (`tapetide-mcp`) is a lightweight stdio bridge — ~300 lines of TypeScript with zero runtime dependencies beyond Node.js 18+. It reads JSON-RPC from stdin, forwards requests to the remote Tapetide MCP server at `mcp.tapetide.com/mcp` with token-based auth, and writes responses to stdout.
+
+- Auto-detects framing: Content-Length (VS Code, Claude Desktop) or newline-delimited JSON (Kiro, Claude Code)
+- Exchanges your refresh token for a 1-hour access token, auto-refreshes before expiry
+- Handles SSE responses from the remote server
+- Warns on stderr when approaching rate limits
+- Wraps HTTP errors as proper JSON-RPC errors
+
+No database, no API keys from third parties, no additional dependencies.
+
+## Authentication
 
 | Method | How it works | Best for |
 |--------|-------------|----------|
@@ -92,11 +102,15 @@ Personal tokens work for both remote and local MCP. Generate one at [tapetide.co
 ## Tools
 
 ### Search & Discovery
-- `search_stocks` — Fuzzy search across all NSE and BSE listed stocks by name, symbol, BSE code, or ISIN. Filter by sector or industry.
+- `search_stocks` — Fuzzy search across all NSE/BSE stocks by name, symbol, BSE code, or ISIN. Filter by sector or industry.
+- `screen_stocks` — Fundamental screener with 326 financial ratios: valuation, profitability, growth, balance sheet, cash flow, shareholding, and historical depth (3Y/5Y/10Y). Plain-English query syntax with cross-field comparisons.
+- `screen_stocks_technical` — Technical screener with real-time data: RSI, MACD, SMA/EMA crossovers, Bollinger Bands, ADX, volume, momentum. Supports `crosses_above`/`crosses_below` for crossover detection.
+- `get_screener_ratios` — Search or list all 326 available ratios for building `screen_stocks` queries.
+- `get_trending_stocks` — Top gainers, losers, and high-volume stocks from Nifty 500.
 
 ### Company Data
-- `get_company_profile` — Company overview with sector, fundamentals (PE, PB, market cap, ROE, ROCE, debt/equity), growth metrics, and current quote. Optionally include technicals, analyst ratings, and peer comparisons in one call.
-- `get_stock_events` — Company news (sentiment-tagged), corporate actions (dividends, splits, bonuses, AGMs), and filings (annual reports, concall transcripts, investor presentations).
+- `get_company_profile` — Company overview with sector, fundamentals (PE, PB, market cap, ROE, ROCE, debt/equity), growth metrics, pros/cons, and current quote. Optionally include technicals, analyst ratings, and peer comparisons in one call.
+- `get_stock_events` — Company news (sentiment-tagged), corporate actions (dividends, splits, bonuses, AGMs), and filings (annual reports, concall transcripts, investor presentations, credit ratings).
 - `get_stock_ownership` — Dividend history (ex-date, amount, type, yield) and mutual fund holdings (which schemes hold the stock, quantity, % of AUM).
 
 ### Quotes & Prices
@@ -109,16 +123,11 @@ Personal tokens work for both remote and local MCP. Generate one at [tapetide.co
 - `get_shareholding` — Promoter, FII, DII, and public shareholding patterns over time. Quarterly or annual.
 - `get_forecasts` — Analyst forecasts for EPS, revenue, EBITDA, net income, ROA, ROE, and price targets. Actuals vs estimates comparison for spotting earnings surprises.
 
-### Stock Screener
-- `screen_stocks` — Custom screener with 100+ filters across fundamentals, technicals, candlestick patterns, shareholding, and industry comparisons. Supports cross-field comparisons (e.g., SMA50 > SMA200, PE < industry PE).
-- `run_preset_screen` — 47 pre-built screener strategies: golden/death crossover, potential multibagger, undervalued near 52W high, bullish/bearish engulfing, overbought/oversold RSI, resistance/support breakouts, and more.
-- `get_screener_presets` — List all preset screens with slugs, names, and categories.
-- `get_trending_stocks` — Top gainers, losers, and high-volume stocks from Nifty 500.
-
 ### Market Data & Institutional Flows
 - `get_market_pulse` — Quick market overview: FII/DII net flows, market valuations (Nifty 50 PE/PB/DY), and top technical signals.
 - `get_fii_dii_detail` — Detailed FII/DII flows: 30-day daily cash market data, F&O participant positioning (FII/DII/Pro/Client long/short OI), weekly/monthly/yearly aggregates, buy/sell streaks, cumulative net flows, and optional chart data.
 - `get_fpi_sectors` — FPI sector-wise investment: AUM share, fortnight change, 1-year cumulative flow per sector.
+- `get_market_news` — Latest market-wide news across all categories with sentiment tagging (positive/negative/neutral), source URLs, and related stock symbols.
 - `market_valuations` — Index PE, PB, and dividend yield over time. Nifty 50, Nifty 500, Bank Nifty, Nifty IT, Nifty Midcap 50, Nifty Next 50. Up to 20 years of history.
 
 ### Market Insights
@@ -130,6 +139,17 @@ Personal tokens work for both remote and local MCP. Generate one at [tapetide.co
 - `market_slbm` — Stock Lending and Borrowing data: available stocks, bid prices, yield calculations.
 - `market_signals` — Technical trading signals: breakouts, moving average crossovers, volume spikes, RSI extremes.
 - `market_heatmap` — Stock heatmap for any index (Nifty 50, Bank Nifty, Nifty IT, etc.) with market cap, PE, PB, and multi-timeframe price changes.
+
+### Portfolio Management
+- `get_user_portfolio` — Current holdings with live prices, P&L (absolute + %), invested value, portfolio weight %, sector breakdown, and company classification.
+- `add_portfolio_stocks` — Add one or more stocks. Auto-merges duplicates with weighted average price. Supports bulk add from broker CSV (Zerodha, Groww, Angel One, Dhan, Upstox, 5Paisa, ICICI Direct, Kotak, HDFC Sky, Motilal Oswal).
+- `update_portfolio_stock` — Update quantity and/or average price for an existing holding.
+- `remove_portfolio_stocks` — Remove one or more stocks from portfolio.
+
+### Watchlist
+- `get_watchlist` — All followed stocks with symbol, name, sector, industry.
+- `add_to_watchlist` — Follow one or more stocks (idempotent).
+- `remove_from_watchlist` — Unfollow one or more stocks.
 
 ## Example Prompts
 
@@ -151,9 +171,6 @@ Personal tokens work for both remote and local MCP. Generate one at [tapetide.co
 
 "What's the dividend history of ITC over the last 5 years? Calculate the
  average dividend yield and compare it to the sector"
-
-"Show me Bajaj Finance's balance sheet — total debt, debt-to-equity ratio trend,
- and how it compares to its peers in the NBFC space"
 ```
 
 ### Advanced Stock Screening
@@ -173,15 +190,6 @@ Personal tokens work for both remote and local MCP. Generate one at [tapetide.co
 
 "Show me stocks where MACD just crossed bullish, volume is 2x the 20-day
  average, and the stock is within 10% of its 52-week high"
-
-"Screen for IT sector stocks with revenue growth above 15%, ROCE above 20%,
- and promoter holding above 50%"
-
-"Find potential multibaggers — small caps with high ROE, low debt, increasing
- institutional holding, and strong quarterly results"
-
-"Which Bank Nifty stocks have RSI below 30 but positive analyst ratings?
- Could be oversold quality names"
 ```
 
 ### Institutional Flow Analysis
@@ -198,34 +206,24 @@ Personal tokens work for both remote and local MCP. Generate one at [tapetide.co
 
 "Show me the F&O participant-wise open interest — are FIIs net long or short
  in index futures right now?"
-
-"What's the 1-year cumulative FII flow trend? Compare it with DII flows to
- see who's been the dominant force"
-
-"Track FPI sector allocation changes — which sectors have FPIs been
- consistently increasing allocation to over the last 6 months?"
 ```
 
-### Technical + Fundamental Combos
+### Portfolio & Watchlist
 
 ```
-"Find stocks that are technically oversold (RSI below 30) but have strong
- fundamentals — ROE above 18%, low debt, and positive analyst ratings"
+"I hold RELIANCE, TCS, INFY, HDFCBANK, and ITC — give me current quotes,
+ which ones are technically weak, and any recent negative news"
 
-"Show me Nifty IT stocks where MACD just crossed bullish, and compare their
- PE ratios to the sector average"
+"Add these to my portfolio: 10 RELIANCE at ₹1350, 50 TCS at ₹3800,
+ 25 HDFCBANK at ₹1650"
 
-"Which stocks are near their Bollinger Band lower band with high delivery
- percentage today? Could be institutional accumulation"
+"I just bought 10 more RELIANCE at ₹1400 — update my portfolio"
 
-"Find golden crossover stocks (SMA50 crossing above SMA200) that also have
- improving quarterly revenue growth and FII buying"
+"Compare 6-month returns of my portfolio stocks against Nifty 50. Which ones
+ are underperforming and what do analysts recommend?"
 
-"Screen for stocks with Supertrend bullish signal, ADX above 25 (strong trend),
- and market cap above 10,000 crores"
-
-"Which Nifty 500 stocks broke above resistance R1 today with above-average
- volume and positive analyst consensus?"
+"Watch TATAMOTORS, MARUTI, M&M — and give me a quick technical setup
+ comparison for each"
 ```
 
 ### Daily Market Briefing
@@ -237,87 +235,29 @@ Personal tokens work for both remote and local MCP. Generate one at [tapetide.co
 "What happened in the market today? Biggest movers, new IPO subscriptions,
  and stocks that triggered technical signals"
 
-"Are there any stocks approaching F&O ban (MWPL above 80%)? Cross-check with
- their recent bulk deal activity and MTF positions"
-
-"Show me the Nifty 50 heatmap — which sectors dragged the index down today
- and which ones held up?"
-
-"What's the MTF trend this week? Are traders adding leveraged positions or
- deleveraging? Show me the top stocks by MTF funded amount"
-
-"Any stocks available for lending with high SLBM yield? That usually signals
- strong short-selling demand"
-```
-
-### Portfolio Review & Monitoring
-
-```
-"I hold RELIANCE, TCS, INFY, HDFCBANK, and ITC — give me current quotes,
- which ones are technically weak, and any recent negative news"
-
-"Compare 6-month returns of my portfolio stocks against Nifty 50. Which ones
- are underperforming and what do analysts recommend?"
-
-"Check if any of these stocks had recent corporate actions or filings I should
- know about: BAJFINANCE, TITAN, DMART, ASIANPAINT"
-
-"For my watchlist — TATAMOTORS, MARUTI, M&M, HEROMOTOCO — show me PE
- comparison, quarterly sales growth, and who has the best technical setup"
-
-"Which of my holdings have seen mutual fund buying increase in the last
- quarter? And which ones have MFs been reducing?"
-```
-
-### IPO & Event Research
-
-```
-"What IPOs are currently open? Show me subscription data — how many times
- subscribed in QIB, retail, and NII categories"
-
-"Any upcoming IPOs this month? What's the price band and issue size?"
-
-"Show me recent company filings for Tata Motors — any concall transcripts
- or investor presentations I should read?"
-
-"What corporate actions are coming up for Nifty 50 stocks — dividends,
- stock splits, or bonus issues?"
-
-"Find stocks that announced results this week with the biggest positive
- earnings surprise vs analyst estimates"
-```
-
-### Market Valuation & Timing
-
-```
 "Is the market overvalued right now? Show me Nifty 50 PE, PB, and dividend
  yield compared to 5-year and 10-year averages"
 
-"Compare Bank Nifty valuation (PE/PB) over the last 3 years — are banking
- stocks cheap relative to history?"
-
-"Show me Nifty Midcap 50 PE trend over 5 years. Where are we now vs the
- historical median?"
-
-"Pull Nifty IT index valuation data for the last 2 years and overlay it
- with FPI sector flows into IT — any correlation?"
+"Show me the Nifty 50 heatmap — which sectors dragged the index down today
+ and which ones held up?"
 ```
 
 ## Data Coverage
 
 | Category | Coverage |
 |----------|----------|
-| Stocks | All NSE and BSE listed companies |
-| Price data | Daily OHLCV (up to 2,000 days) + weekly aggregation |
+| Stocks | All NSE and BSE listed companies (~8,200) |
+| Price data | Daily OHLCV (up to 2,000 days) + weekly aggregation + delivery % |
 | Financials | Quarterly + annual P&L, balance sheet, cash flow, ratios |
-| Screener | 100+ filters, 47 preset strategies, cross-field comparisons |
+| Screener | 326 fundamental ratios + real-time technical indicators, cross-field comparisons |
 | Technicals | 20+ indicators: RSI, SMA, EMA, MACD, Bollinger Bands, ADX, ATR, Supertrend, Stochastic, MFI, CCI, Williams %R, pivot points |
-| Candlestick patterns | Bullish/bearish engulfing, hammer, shooting star, morning/evening star, three white soldiers, three black crows, and more |
+| Candlestick patterns | Bullish/bearish engulfing, hammer, shooting star, morning/evening star, three white soldiers, three black crows, dark cloud cover, piercing |
 | Institutional flows | FII/DII daily cash + F&O participant OI, FPI sector-wise, buy/sell streaks |
-| Market insights | Bulk/block deals, F&O data, IPOs, top deliveries, MTF, SLBM, heatmaps, signals |
+| Market insights | Bulk/block deals, F&O ban, IPOs, top deliveries, MTF, SLBM, heatmaps, signals |
 | Analyst data | Consensus ratings + EPS/revenue/EBITDA/ROE/ROA forecasts with actuals vs estimates |
 | Ownership | Shareholding patterns, dividend history, mutual fund scheme-level holdings |
 | Events | Sentiment-tagged news, corporate actions, company filings (annual reports, concalls, presentations) |
+| Portfolio | Live P&L tracking, sector breakdown, broker CSV import (10+ brokers supported) |
 
 ## Rate Limits
 
@@ -342,7 +282,7 @@ Enable debug logging for more details: set `TAPETIDE_DEBUG=1` in your env config
 ## Links
 
 - [tapetide.com](https://tapetide.com) — Web platform
-- [tapetide.com/mcp](https://tapetide.com/mcp) — MCP server documentation
+- [tapetide.com/mcp](https://tapetide.com/mcp) — MCP documentation
 - [mcp.tapetide.com](https://mcp.tapetide.com) — Remote MCP endpoint
 - [npm: tapetide-mcp](https://www.npmjs.com/package/tapetide-mcp) — npm package
 - [@tapetide_hq](https://x.com/tapetide_hq) — X (Twitter)
