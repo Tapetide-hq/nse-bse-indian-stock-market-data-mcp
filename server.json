@@ -3,7 +3,7 @@
   "name": "com.tapetide/stock-research-mcp",
   "description": "Indian stock market MCP server — 34 tools for NSE/BSE stock research, screening, financials, technicals, portfolio tracking, and market insights.",
   "repository": {
-    "url": "https://github.com/Tapetide-hq/tapetide-stock-research-mcp",
+    "url": "https://github.com/Tapetide-hq/nse-bse-indian-stock-market-data-mcp",
     "source": "github"
   },
   "version": "1.0.5",
