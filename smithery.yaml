@@ -1,0 +1,27 @@
+# Smithery configuration for tapetide-mcp
+# https://smithery.ai/docs/build/project-config
+#
+# NSE & BSE Indian stock market data MCP server (stdio bridge to mcp.tapetide.com).
+# Get a free token at https://tapetide.com/settings/tokens
+
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    required:
+      - tapetideToken
+    properties:
+      tapetideToken:
+        type: string
+        title: Tapetide API Token
+        description: >-
+          Your Tapetide API token (starts with tpt_rt_). Get one free at
+          https://tapetide.com/settings/tokens
+  commandFunction: |-
+    (config) => ({
+      command: 'npx',
+      args: ['-y', 'tapetide-mcp'],
+      env: { TAPETIDE_TOKEN: config.tapetideToken }
+    })
+  exampleConfig:
+    tapetideToken: tpt_rt_your_token_here
