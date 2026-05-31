@@ -4,10 +4,10 @@
   </a>
 </p>
 
-<h1 align="center">Tapetide Stock Research MCP Server</h1>
+<h1 align="center">NSE & BSE Indian Stock Market Data MCP Server</h1>
 
 <p align="center">
-  <strong>Indian stock market data for AI assistants — 34 tools for NSE & BSE stock analysis</strong>
+  <strong>The Model Context Protocol server for Indian stock markets — 34 tools to search, screen & analyze all 8,200+ NSE and BSE stocks from Claude, ChatGPT, Cursor & any AI assistant</strong>
 </p>
 
 <p align="center">
@@ -317,7 +317,7 @@ Set `TAPETIDE_DEBUG=1` for detailed logging to stderr.
 - **[mcp.tapetide.com](https://mcp.tapetide.com)** — Remote MCP endpoint
 - **[npm: tapetide-mcp](https://www.npmjs.com/package/tapetide-mcp)** — npm package
 - **[@tapetide_hq](https://x.com/tapetide_hq)** — X (Twitter)
-- **[GitHub](https://github.com/Tapetide-hq/tapetide-stock-research-mcp)** — Source code
+- **[GitHub](https://github.com/Tapetide-hq/nse-bse-indian-stock-market-data-mcp)** — Source code
 
 ## Contributing
 

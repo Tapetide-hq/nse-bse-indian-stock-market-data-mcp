@@ -57,11 +57,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Tapetide-hq/tapetide-stock-research-mcp.git"
+    "url": "git+https://github.com/Tapetide-hq/nse-bse-indian-stock-market-data-mcp.git"
   },
   "homepage": "https://tapetide.com/mcp",
   "bugs": {
-    "url": "https://github.com/Tapetide-hq/tapetide-stock-research-mcp/issues"
+    "url": "https://github.com/Tapetide-hq/nse-bse-indian-stock-market-data-mcp/issues"
   },
   "author": "Tapetide <hello@tapetide.com> (https://tapetide.com)",
   "files": [
