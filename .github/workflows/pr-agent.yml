@@ -20,9 +20,20 @@ jobs:
         uses: Codium-ai/pr-agent@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OPENAI.KEY: ${{ secrets.ANTHROPIC_KEY }}
-          OPENAI.API_BASE: "https://kiro-worker.kamero.workers.dev/v1"
-          CONFIG.MODEL: "openai/claude-opus-4.6"
-          CONFIG.MODEL_TURBO: "openai/claude-opus-4.6"
-          CONFIG.FALLBACK_MODELS: '["openai/claude-opus-4.6"]'
-          CONFIG.CUSTOM_MODEL_MAX_TOKENS: "1000000"
+          # Route through the Kiro Gateway via LiteLLM's Anthropic provider so
+          # PR Agent hits the native /v1/messages endpoint. The gateway is a
+          # drop-in Anthropic API replacement (see /docs/ai_API_GUIDE.md).
+          # LiteLLM appends /v1/messages itself, so the base URL has no /v1.
+          # ANTHROPIC.KEY (dynaconf form) is what PR Agent reads from settings
+          # and forwards to litellm.anthropic_key. ANTHROPIC_API_KEY alone is
+          # not auto-copied for Anthropic the way OPENAI_KEY is.
+          ANTHROPIC.KEY: ${{ secrets.KIRO_GATEWAY_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.KIRO_GATEWAY_KEY }}
+          ANTHROPIC_API_BASE: "https://kiro-worker.kamero.workers.dev"
+          config.model: "anthropic/claude-opus-4.8"
+          config.fallback_models: '["anthropic/claude-opus-4.6"]'
+          # PR Agent only ships MAX_TOKENS entries for known model slugs; our
+          # gateway-internal names (`claude-opus-4.8`, `claude-opus-4.6`) aren't
+          # in its table, so we tell it the context window explicitly. PR Agent
+          # caps its own prompt budget at max_model_tokens (32k) regardless.
+          config.custom_model_max_tokens: "200000"
