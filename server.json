@@ -36,7 +36,8 @@
         "type": "oauth2",
         "authorizationUrl": "https://mcp.tapetide.com/authorize",
         "tokenUrl": "https://mcp.tapetide.com/token",
-        "registrationUrl": "https://mcp.tapetide.com/register"
+        "registrationUrl": "https://mcp.tapetide.com/register",
+        "scopes": ["openid", "email"]
       }
     }
   ]

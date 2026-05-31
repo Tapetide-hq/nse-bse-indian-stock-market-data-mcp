@@ -36,7 +36,7 @@ Published on npm as `tapetide-mcp`. No cloning or building required.
   "mcpServers": {
     "tapetide": {
       "command": "npx",
-      "args": ["-y", "tapetide-mcp@latest"],
+      "args": ["-y", "tapetide-mcp"],
       "env": {
         "TAPETIDE_TOKEN": "your_token_here"
       }

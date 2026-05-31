@@ -80,7 +80,7 @@ For stdio-based MCP clients. No cloning or building required — runs via `npx`:
   "mcpServers": {
     "tapetide": {
       "command": "npx",
-      "args": ["-y", "tapetide-mcp@latest"],
+      "args": ["-y", "tapetide-mcp"],
       "env": {
         "TAPETIDE_TOKEN": "your_token_here"
       }
