@@ -1,7 +1,7 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "com.tapetide/stock-research-mcp",
-  "description": "Indian stock market research: quotes, financials, technicals, screener, portfolio, watchlist, FII/DII and market insights.",
+  "description": "Indian stock market MCP server — 34 tools for NSE/BSE stock research, screening, financials, technicals, portfolio tracking, and market insights.",
   "repository": {
     "url": "https://github.com/Tapetide-hq/tapetide-stock-research-mcp",
     "source": "github"
@@ -24,6 +24,21 @@
           "name": "TAPETIDE_TOKEN"
         }
       ]
+    }
+  ],
+  "remoteEndpoints": [
+    {
+      "url": "https://mcp.tapetide.com/mcp",
+      "transport": {
+        "type": "http"
+      },
+      "authentication": {
+        "type": "oauth2",
+        "authorizationUrl": "https://mcp.tapetide.com/authorize",
+        "tokenUrl": "https://mcp.tapetide.com/token",
+        "registrationUrl": "https://mcp.tapetide.com/register",
+        "scopes": ["openid", "email"]
+      }
     }
   ]
 }
