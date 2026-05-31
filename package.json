@@ -1,8 +1,8 @@
 {
   "name": "tapetide-mcp",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "mcpName": "com.tapetide/stock-research-mcp",
-  "description": "Tapetide Stock Research MCP Server — search, screen, and analyze all NSE/BSE stocks with 26 tools for quotes, financials, technicals, analyst ratings, forecasts, FII/DII flows, screener, and market insights. Works with Claude, ChatGPT, Cursor, Kiro, and any MCP client.",
+  "description": "Tapetide Stock Research MCP Server — search, screen, and analyze all NSE/BSE stocks with 34 tools for quotes, financials, technicals, analyst ratings, forecasts, FII/DII flows, screener, portfolio tracking, watchlist, and market insights. Works with Claude, ChatGPT, Cursor, Kiro, and any MCP client.",
   "type": "module",
   "bin": {
     "tapetide-mcp": "./dist/index.js"
@@ -32,6 +32,8 @@
     "fii-dii",
     "ipo",
     "mutual-funds",
+    "portfolio",
+    "watchlist",
     "ai",
     "llm",
     "claude",
@@ -59,7 +61,7 @@
     "node": ">=18"
   },
   "devDependencies": {
-    "@types/node": "^25.5.0",
+    "@types/node": "^22.15.0",
     "typescript": "^5.7.0"
   }
 }

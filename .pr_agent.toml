@@ -10,6 +10,7 @@ extra_instructions = """\
 - Check TypeScript type safety and proper async/await patterns
 - Verify API response handling and data transformation logic
 - Flag any hardcoded secrets or credentials
+- This is a stdio bridge — verify JSON-RPC framing, SSE parsing, and auth token lifecycle
 """
 num_code_suggestions = 4
 require_score_review = true

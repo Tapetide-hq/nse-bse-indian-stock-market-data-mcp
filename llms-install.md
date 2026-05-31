@@ -59,6 +59,58 @@ The local server runs as a stdio bridge. It reads JSON-RPC from stdin, forwards 
 
 No additional dependencies, database setup, or API keys from third parties are needed.
 
+## Available Tools (34)
+
+### Search & Discovery
+- `search_stocks` — Fuzzy search by name, symbol, BSE code, or ISIN
+- `screen_stocks` — Fundamental screener with 326 ratios
+- `screen_stocks_technical` — Real-time technical screener (RSI, MACD, SMA/EMA crossovers, Bollinger, ADX)
+- `get_screener_ratios` — Search/list all 326 available ratios
+- `get_trending_stocks` — Top gainers, losers, high-volume stocks
+
+### Company Data
+- `get_company_profile` — Full overview with optional technicals, ratings, peers
+- `get_stock_events` — News, corporate actions, filings
+- `get_stock_ownership` — Dividend history + mutual fund holdings
+
+### Quotes & Prices
+- `get_stock_quote` — Live price, change, volume, market cap, 52-week range
+- `get_batch_quotes` — Up to 20 quotes in one call
+- `get_price_history` — Daily/weekly OHLCV (up to 2,000 days)
+
+### Financials & Fundamentals
+- `get_financials` — P&L, balance sheet, cash flow, ratios
+- `get_shareholding` — Promoter, FII, DII, public holdings over time
+- `get_forecasts` — Analyst EPS/revenue/EBITDA estimates vs actuals
+
+### Market Data & Institutional Flows
+- `get_market_pulse` — FII/DII flows, valuations, top signals
+- `get_fii_dii_detail` — 30-day daily flows, F&O positioning, aggregates
+- `get_fpi_sectors` — FPI sector-wise investment data
+- `get_market_news` — Sentiment-tagged market news across categories
+- `market_valuations` — Index PE/PB/DY over time (up to 20 years)
+
+### Market Insights
+- `market_deals` — Bulk and block deals
+- `market_fno_ban` — F&O ban list and approaching-ban stocks
+- `market_ipo` — Current and upcoming IPOs with subscription data
+- `market_deliveries` — Highest delivery % stocks
+- `market_mtf` — Margin trading facility data
+- `market_slbm` — Stock lending and borrowing data
+- `market_signals` — Technical breakouts, crossovers, RSI extremes
+- `market_heatmap` — Index constituent heatmap with multi-timeframe changes
+
+### Portfolio Management
+- `get_user_portfolio` — Holdings with live P&L, sector breakdown
+- `add_portfolio_stocks` — Add stocks (supports broker CSV import)
+- `update_portfolio_stock` — Update quantity/avg price
+- `remove_portfolio_stocks` — Remove stocks from portfolio
+
+### Watchlist
+- `get_watchlist` — All followed stocks
+- `add_to_watchlist` — Follow stocks (idempotent)
+- `remove_from_watchlist` — Unfollow stocks
+
 ## Verification
 
 After installation, try calling the `search_stocks` tool with query `"Reliance"` to confirm the server is working. You should get back a list of matching stocks.
