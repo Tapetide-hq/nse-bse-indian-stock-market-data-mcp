@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://tapetide.com/mcp">
-    <img src="https://assets.tapetide.com/logo.svg" alt="Tapetide — Indian Stock Market MCP Server" width="80" />
+    <img src="https://assets.tapetide.com/logo-filled-tight.svg" alt="Tapetide — Indian Stock Market MCP Server" width="80" />
   </a>
 </p>
 
