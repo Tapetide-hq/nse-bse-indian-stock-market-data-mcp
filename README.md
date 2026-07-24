@@ -15,6 +15,7 @@
   <a href="https://www.npmjs.com/package/tapetide-mcp"><img src="https://img.shields.io/npm/dm/tapetide-mcp" alt="npm downloads" /></a>
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License" /></a>
   <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/MCP-compatible-blue" alt="MCP compatible" /></a>
+  <a href="https://glama.ai/mcp/servers/Tapetide-hq/nse-bse-indian-stock-market-data-mcp"><img src="https://glama.ai/mcp/servers/Tapetide-hq/nse-bse-indian-stock-market-data-mcp/badges/score.svg" alt="nse-bse-indian-stock-market-data-mcp MCP server" /></a>
 </p>
 
 <p align="center">
@@ -318,6 +319,9 @@ Set `TAPETIDE_DEBUG=1` for detailed logging to stderr.
 - **[npm: tapetide-mcp](https://www.npmjs.com/package/tapetide-mcp)** — npm package
 - **[@tapetide_hq](https://x.com/tapetide_hq)** — X (Twitter)
 - **[GitHub](https://github.com/Tapetide-hq/nse-bse-indian-stock-market-data-mcp)** — Source code
+- **[Glama](https://glama.ai/mcp/servers/Tapetide-hq/nse-bse-indian-stock-market-data-mcp)** — MCP directory listing
+
+<a href="https://glama.ai/mcp/servers/Tapetide-hq/nse-bse-indian-stock-market-data-mcp"><img width="380" src="https://glama.ai/mcp/servers/Tapetide-hq/nse-bse-indian-stock-market-data-mcp/badges/card.svg" alt="nse-bse-indian-stock-market-data-mcp MCP server" /></a>
 
 ## Contributing
 
