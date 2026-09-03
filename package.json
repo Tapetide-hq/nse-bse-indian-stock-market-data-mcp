@@ -9,6 +9,8 @@
   },
   "scripts": {
     "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "check:catalog": "node scripts/check-catalog-parity.mjs",
     "prepublishOnly": "tsc"
   },
   "keywords": [
