@@ -107,7 +107,8 @@ The npm package is a lightweight stdio bridge (~300 lines, zero runtime dependen
 - Auto-detects framing: Content-Length (VS Code, Claude Desktop) or newline-delimited JSON (Kiro, Claude Code)
 - Exchanges your refresh token for a 1-hour HMAC access token, auto-refreshes before expiry
 - Handles SSE responses from the remote server
-- Warns on stderr when approaching rate limits
+- Identifies your MCP client to the remote via `User-Agent`, and echoes the negotiated protocol version
+- Warns on stderr when the server rate-limits a call, naming the retry delay
 
 All 34 tools and their logic run on the remote server — the npm package is just the transport layer.
 
