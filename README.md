@@ -7,7 +7,7 @@
 <h1 align="center">NSE & BSE Indian Stock Market Data MCP Server</h1>
 
 <p align="center">
-  <strong>The Model Context Protocol server for Indian stock markets — 34 tools to search, screen & analyze all 8,200+ NSE and BSE stocks from Claude, ChatGPT, Cursor & any AI assistant</strong>
+  <strong>The Model Context Protocol server for Indian stock markets — 52 tools to search, screen & analyze all 8,200+ NSE and BSE stocks from Claude, ChatGPT, Cursor & any AI assistant</strong>
 </p>
 
 <p align="center">
@@ -21,7 +21,7 @@
 <p align="center">
   <a href="https://tapetide.com/mcp">Documentation</a> •
   <a href="#quick-start">Quick Start</a> •
-  <a href="#tools">34 Tools</a> •
+  <a href="#tools">52 Tools</a> •
   <a href="#example-prompts">Example Prompts</a> •
   <a href="https://www.npmjs.com/package/tapetide-mcp">npm</a>
 </p>
@@ -109,7 +109,9 @@ The npm package is a lightweight stdio bridge (~300 lines, zero runtime dependen
 - Handles SSE responses from the remote server
 - Warns on stderr when approaching rate limits
 
-All 34 tools and their logic run on the remote server — the npm package is just the transport layer.
+All 52 tools and their logic run on the remote server — the npm package is just the transport layer.
+Because it forwards JSON-RPC verbatim, tools shipped on the remote are available immediately without
+upgrading this package.
 
 ## Authentication
 
@@ -123,79 +125,132 @@ Generate a free personal token at [tapetide.com/settings/tokens](https://tapetid
 
 ## Tools
 
-### 🔍 Search & Discovery (5 tools)
+> Tip: ask your assistant to call `read_me` first. It returns the full in-session guide — every
+> tool by category, usage patterns, and the rules the server expects clients to follow.
+
+<!-- tools:start — mirrors the server's tool catalog, which is parity-tested against the tools the
+     server actually registers. When the server's catalog changes, regenerate this block; do not
+     hand-edit an individual count. -->
+
+### 🔍 Discovery & Screening (5 tools)
 
 | Tool | Description |
 |------|-------------|
-| `search_stocks` | Fuzzy search all NSE/BSE stocks by name, symbol, BSE code, or ISIN. Filter by sector/industry. |
-| `screen_stocks` | Fundamental screener with 326 ratios — PE, ROCE, sales growth, debt/equity, Piotroski score, and more. Plain-English query syntax. |
-| `screen_stocks_technical` | Real-time technical screener — RSI, MACD, SMA/EMA crossovers, Bollinger Bands, ADX, volume. Supports `crosses_above`/`crosses_below`. |
-| `get_screener_ratios` | Search or browse all 326 available fundamental ratios. |
-| `get_trending_stocks` | Today's top gainers, losers, and high-volume stocks from Nifty 500. |
+| `search_stocks` | Resolve a company to its symbol by name, symbol, BSE code, or ISIN — including brand names and post-rename aliases (`Zomato` → `ETERNAL`). Filter by sector/industry. |
+| `screen_stocks` | Fundamental screener over 326 ratios — PE, ROCE, sales growth, debt/equity, Piotroski score. Plain-English query syntax with AND/OR logic and cross-field comparisons. |
+| `screen_stocks_technical` | Real-time technical screener — RSI, MACD, SMA/EMA crossovers, Bollinger Bands, ADX, volume, momentum. Supports `crosses_above`/`crosses_below`. |
+| `get_screener_ratios` | Search or browse the full 326-ratio catalog to get exact ratio names for a query. |
+| `get_trending_stocks` | Today's top gainers, losers, and most-active stocks from the Nifty 500. |
 
-### 📊 Company Analysis (3 tools)
-
-| Tool | Description |
-|------|-------------|
-| `get_company_profile` | Full overview — sector, fundamentals, growth metrics, pros/cons. Optionally include technicals (20+ indicators), analyst ratings, and peer comparison in one call. |
-| `get_stock_events` | News (sentiment-tagged), corporate actions (dividends, splits, bonuses), and filings (annual reports, concall transcripts, investor presentations). |
-| `get_stock_ownership` | Dividend history with yield calculations + mutual fund scheme-level holdings. |
-
-### 💰 Quotes & Prices (3 tools)
+### 📊 Company Analysis (9 tools)
 
 | Tool | Description |
 |------|-------------|
+| `get_company_profile` | Full overview — sector, business summary, pros/cons, fundamentals, growth metrics, current quote. Optionally add technicals (20+ indicators), analyst ratings, and peers in the same call. |
 | `get_stock_quote` | Live price — LTP, change %, volume, market cap, PE, PB, 52-week high/low. |
 | `get_batch_quotes` | Up to 20 stock quotes in a single call. |
-| `get_price_history` | Daily or weekly OHLCV with delivery %. Up to 2,000 days of history. |
+| `get_price_history` | Daily or weekly OHLCV with delivery %. Up to 2,000 sessions per call, pageable further back. |
+| `get_financials` | Quarterly + annual P&L, balance sheet, cash flow, and ratios. Each period is stamped with when it was actually published, so backtests can avoid look-ahead bias. |
+| `get_shareholding` | Promoter, FII, DII, and public holdings quarter by quarter. |
+| `get_forecasts` | Analyst EPS, revenue, EBITDA, net income, ROA, and ROE estimates against actuals — for spotting earnings surprises. |
+| `get_stock_events` | Sentiment-tagged news, corporate actions (dividends, splits, bonuses, AGMs), and filings (results, presentations, concall transcripts, annual reports). |
+| `get_stock_ownership` | Dividend history with yields + which mutual fund schemes hold the stock and at what share of AUM. |
 
-### 📈 Financials & Fundamentals (3 tools)
-
-| Tool | Description |
-|------|-------------|
-| `get_financials` | Quarterly + annual P&L, balance sheet, cash flow, and ratios. Fetch individual sections or all at once. |
-| `get_shareholding` | Promoter, FII, DII, and public shareholding patterns over time. |
-| `get_forecasts` | Analyst forecasts — EPS, revenue, EBITDA, net income, ROA, ROE, and price targets. Actuals vs estimates for spotting earnings surprises. |
-
-### 🏛️ Market Data & Institutional Flows (5 tools)
+### 🏛️ Market-Wide Data (11 tools)
 
 | Tool | Description |
 |------|-------------|
-| `get_market_pulse` | Quick overview — FII/DII net flows, Nifty 50 PE/PB/DY, top technical signals. |
-| `get_fii_dii_detail` | 30-day daily cash market flows, F&O participant positioning (long/short OI), weekly/monthly/yearly aggregates, buy/sell streaks, cumulative chart data. |
-| `get_fpi_sectors` | FPI sector-wise investment — AUM share, fortnight change, 1-year cumulative flow. |
-| `get_market_news` | Sentiment-tagged market news across categories (companies, global, IPO, policy, tech). |
-| `market_valuations` | Index PE, PB, dividend yield over time — Nifty 50, Bank Nifty, Nifty IT, Midcap 50. Up to 20 years. |
+| `get_market_pulse` | The at-a-glance daily snapshot — FII/DII net flows, Nifty 50 valuations, and India VIX in one call. |
+| `get_fii_dii_detail` | 30 days of daily cash-market flows, F&O participant long/short OI, weekly/monthly/yearly aggregates, buy/sell streaks, cumulative net flows. |
+| `get_fii_dii_flows` | Alias of `get_fii_dii_detail`. |
+| `get_fpi_sectors` | FPI investment by sector — AUM share, fortnightly change, 1-year cumulative flow. |
+| `get_market_news` | Market-wide news across categories with sentiment and related symbols. |
+| `get_market_data` | One dispatcher for seven daily feeds via `dataset`: `deals`, `fno_ban`, `deliveries`, `ipo`, `mtf`, `slbm`, `signals`. |
+| `market_heatmap` | Every constituent of an index with market cap, PE, PB, returns from 1d to 5y, volume, sector — 16 indices. |
+| `market_valuations` | Index PE, PB, and dividend yield over time. Up to 20 years. |
+| `get_india_vix` | The India VIX fear gauge — latest level, daily change, recent history. |
+| `get_index_performance` | Rank ~140 NSE indices by return over completed weeks or months. Filter to sectoral, broad, thematic, or strategy families — the right answer to "which sector led last month". |
+| `get_index_history` | OHLC level series plus PE/PB/dividend yield for a single index. The index counterpart of `get_price_history`. |
 
-### 📡 Market Insights (8 tools)
-
-| Tool | Description |
-|------|-------------|
-| `market_deals` | Today's bulk and block deals — client name, buy/sell, quantity, price, value. |
-| `market_fno_ban` | F&O ban list (MWPL ≥ 95%) and stocks approaching ban (80-95%). |
-| `market_ipo` | Current and upcoming IPOs with subscription data (QIB, retail, NII, total). |
-| `market_deliveries` | Stocks with highest delivery % today — genuine buying vs speculative trading. |
-| `market_mtf` | Margin Trading Facility — consolidated figures, per-stock funded positions, trends. |
-| `market_slbm` | Stock Lending & Borrowing — available stocks, bid prices, yield (short-selling demand). |
-| `market_signals` | Technical signals — breakouts, MA crossovers, volume spikes, RSI extremes. |
-| `market_heatmap` | Index heatmap (Nifty 50, Bank Nifty, IT, Pharma, etc.) with multi-timeframe price changes. |
-
-### 💼 Portfolio Management (4 tools)
+### 🎲 Derivatives & Risk (5 tools)
 
 | Tool | Description |
 |------|-------------|
-| `get_user_portfolio` | Holdings with live prices, P&L (absolute + %), sector breakdown, weight %. |
-| `add_portfolio_stocks` | Add stocks — supports bulk add and broker CSV import (Zerodha, Groww, Angel One, Dhan, Upstox, 5Paisa, ICICI Direct, Kotak, HDFC Sky, Motilal Oswal). |
-| `update_portfolio_stock` | Update quantity or average price for additional purchases or partial sells. |
-| `remove_portfolio_stocks` | Remove stocks from portfolio. |
+| `get_option_chain` | Per-strike index option chain with IV, full Greeks, bid/ask, open interest, max pain, PCR. NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY — a stamped end-of-day snapshot. |
+| `get_option_iv_history` | Session-by-session ATM IV, IV rank, IV percentile, realised vol, PCR, max pain, 25-delta skew for ~556 underlyings, individual stocks included. |
+| `get_options_analytics` | Latest per-expiry aggregates — ATM IV, IV rank/percentile, realised vol, PCR by OI and volume, max pain, skew, call/put OI. |
+| `get_promoter_pledge` | Promoter share-pledge percentage by quarter plus pledge/release events — a standard governance red-flag check. |
+| `get_credit_ratings` | Credit-rating actions by agency with rating, action, and outlook over time. |
+
+### 🔬 Research & Scoring (4 tools)
+
+| Tool | Description |
+|------|-------------|
+| `get_stock_deals` | Bulk, block, insider, and substantial-acquisition (SAST) disclosures per stock, with counterparty, side, quantity, value. |
+| `get_tapetide_score` | The deterministic 0-100 Tapetide Score for one stock with its six pillar sub-scores, band, percentile, data confidence, and any governance caps or red flags. |
+| `screen_tapetide_scores` | Rank and filter the scored universe by band, size bucket, sector, score window, and confidence, with cursor pagination. |
+| `get_earnings_call_summary` | Structured digest of recent earnings-call transcripts and investor presentations — highlights, risks, guidance, headline metrics. |
+
+### ⏳ Point-in-Time & Backtest Safety (5 tools)
+
+| Tool | Description |
+|------|-------------|
+| `get_adjustment_factors` | Split and bonus adjustment timeline for reconstructing raw prices — plus the rights and demerger events that carry no reliable factor at all. |
+| `get_observation_status` | Per-calendar-day reason a price is present or missing: traded, weekend, holiday, pre-listing, delisted, or no print. A missing day is not a zero return. |
+| `get_index_membership_asof` | Was a stock in an index on a given date? Answers `present`, `uncertain`, `absent`, or `out_of_coverage` — survivorship-bias-aware universe construction. |
+| `resolve_identifier_asof` | Map a historical symbol or ISIN to the company that held it on a date, for old holdings files and recycled tickers. |
+| `get_identifiers_asof` | The reverse lookup — which symbol and ISIN a company traded under at a point in time. |
+
+### 💼 Portfolio (4 tools)
+
+Requires a connected Tapetide account.
+
+| Tool | Description |
+|------|-------------|
+| `get_user_portfolio` | Holdings with live prices, absolute and % P&L, invested value, weight, sector, market-cap class. |
+| `add_portfolio_stocks` | Add holdings singly or in bulk, including rows parsed from a broker CSV or screenshot (Zerodha, Groww, Angel One, Dhan, Upstox, 5Paisa, ICICI Direct, Kotak, HDFC Sky, Motilal Oswal). Duplicates merge on a weighted-average price. |
+| `update_portfolio_stock` | Update quantity and average price after a top-up or partial sell. |
+| `remove_portfolio_stocks` | Remove holdings from the portfolio. |
 
 ### 👁️ Watchlist (3 tools)
 
+Requires a connected Tapetide account.
+
 | Tool | Description |
 |------|-------------|
-| `get_watchlist` | All followed stocks with symbol, name, sector, industry. |
-| `add_to_watchlist` | Follow one or more stocks (idempotent). |
-| `remove_from_watchlist` | Unfollow stocks. |
+| `get_watchlist` | Every followed stock with sector and industry. |
+| `add_to_watchlist` | Follow one or many stocks. Idempotent. |
+| `remove_from_watchlist` | Unfollow one or many stocks. |
+
+### 📖 Guide & Aliases (6 tools)
+
+| Tool | Description |
+|------|-------------|
+| `read_me` | The full in-session guide — every tool by category, the SEBI disclaimer rule, portfolio-first behaviour, parallel-call patterns. Assistants should call it first. |
+| `scan_movers` | Alias of `get_trending_stocks`. |
+| `get_live_quote` | Alias of `get_stock_quote`. |
+| `get_stock_news` | Alias of `get_stock_events` with `type: "news"`. |
+| `get_corporate_actions` | Alias of `get_stock_events` with `type: "corporate_actions"`. |
+| `run_preset_screen` | Redirect that points a preset-screen request at the screener tool that can actually answer it. |
+
+<!-- tools:end -->
+
+### Retired tool names
+
+These names were removed. Calling one returns a message naming its replacement, so a client can
+recover in the same turn — but new integrations should use the replacement directly.
+
+| Retired | Replacement |
+|---------|-------------|
+| `market_deals` | `get_market_data` with `dataset: "deals"` |
+| `market_fno_ban` | `get_market_data` with `dataset: "fno_ban"` |
+| `market_deliveries` | `get_market_data` with `dataset: "deliveries"` |
+| `market_ipo` | `get_market_data` with `dataset: "ipo"` |
+| `market_mtf` | `get_market_data` with `dataset: "mtf"` |
+| `market_slbm` | `get_market_data` with `dataset: "slbm"` |
+| `market_signals` | `get_market_data` with `dataset: "signals"` |
+| `get_quant_signal` | `get_tapetide_score` (a different measurement, not a rename) |
+| `screen_by_quant_signal` | `screen_tapetide_scores` (a different measurement, not a rename) |
 
 ## Example Prompts
 
@@ -253,6 +308,39 @@ Generate a free personal token at [tapetide.com/settings/tokens](https://tapetid
  sales growth"
 ```
 
+### Derivatives & Volatility
+
+```
+"Is RELIANCE implied volatility high right now? Show IV rank and percentile
+ versus realised vol over the last year"
+
+"Show the NIFTY option chain around ATM — open interest by strike, max pain,
+ and the put-call ratio"
+
+"Which sectors led the last 3 completed weeks? Rank the sectoral indices"
+```
+
+### Scoring & Risk Screens
+
+```
+"What's the Tapetide Score for TATASTEEL and why — break down the pillars"
+
+"Show me Strong-band pharma stocks among large and mid caps"
+
+"Any governance red flags on this stock? Check promoter pledge trend and
+ recent credit rating actions"
+```
+
+### Backtest Safety
+
+```
+"Was IDEA in the Nifty 500 on 2019-03-31? I need point-in-time membership,
+ not today's list"
+
+"This stock shows a 60% single-day move in 2022 — was that a split or a real
+ return? Check the adjustment factors"
+```
+
 ### Daily Market Briefing
 
 ```
@@ -275,9 +363,15 @@ Generate a free personal token at [tapetide.com/settings/tokens](https://tapetid
 | **Technicals** | RSI, SMA, EMA, MACD, Bollinger Bands, ADX, ATR, Supertrend, Stochastic, CCI, pivot points, 8 candlestick patterns |
 | **Institutional** | FII/DII daily cash flows, F&O participant OI, FPI sector-wise allocation, buy/sell streaks |
 | **Market data** | Bulk/block deals, F&O ban, IPOs, delivery %, MTF, SLBM, heatmaps, signals |
+| **Indices** | ~140 NSE indices — level history with PE/PB/DY, plus weekly/monthly return rankings by sector, broad, thematic, and strategy family |
+| **Derivatives** | Index option chains with IV and full Greeks, OI, max pain, PCR; IV rank/percentile and realised-vol history for ~556 underlyings including single stocks; India VIX |
 | **Analyst** | Buy/hold/sell consensus + EPS/revenue/EBITDA/ROE forecasts with actuals vs estimates |
 | **Ownership** | Shareholding patterns (quarterly), dividend history, mutual fund scheme-level holdings |
-| **News & Events** | Sentiment-tagged news, corporate actions, filings (annual reports, concall transcripts) |
+| **Large trades** | Bulk, block, insider (designated-person), and SAST disclosures with counterparty and value |
+| **Governance & risk** | Promoter share-pledge history and events, credit-rating actions by agency with outlook |
+| **Scoring** | Tapetide Score — deterministic 0-100 rating with six pillar sub-scores, band, percentile, data confidence, governance caps |
+| **Point-in-time** | Split/bonus adjustment factors, per-day observation status, as-of index membership, historical symbol/ISIN resolution — for survivorship-bias-aware backtests |
+| **News & Events** | Sentiment-tagged news, corporate actions, filings (annual reports, concall transcripts), AI digests of earnings calls and investor presentations |
 | **Portfolio** | Live P&L tracking, sector breakdown, broker CSV import (10+ Indian brokers) |
 
 ## Environment Variables
@@ -290,13 +384,23 @@ Generate a free personal token at [tapetide.com/settings/tokens](https://tapetid
 
 ## Rate Limits
 
-| Plan | Hourly | Daily |
-|------|--------|-------|
-| Remote MCP (OAuth) | 100 requests | 1,000 requests |
-| Remote MCP (token) | 1,000 requests | 4,000 requests |
-| Local MCP (npm) | 1,000 requests | 4,000 requests |
+Limits are per Tapetide account and identical across all three access methods (OAuth, remote token,
+and this npm bridge) — they follow your plan, not your transport.
 
-Rate limit headers (`X-RateLimit-Remaining`, `X-RateLimit-Limit`, `X-RateLimit-Reset`) are included in every response.
+| Scope | Free plan | Paid plans |
+|-------|-----------|------------|
+| Per day | 50 tool calls | Per your plan |
+| Per calendar month | 1,000 tool calls | Per your plan (unlimited on enterprise) |
+| Burst | 60 tool calls per minute | 60 tool calls per minute |
+
+Only **successful tool calls** consume quota. Protocol traffic (`initialize`, `tools/list`) and
+burst-denied calls are free. Daily and monthly windows reset on IST boundaries.
+
+When a limit is hit, the server replies with a normal JSON-RPC result carrying `isError: true` and a
+message naming the binding cap and its reset time, so your assistant relays it instead of retrying.
+Responses carry `X-RateLimit-Reset`, and denials add `Retry-After`. The numeric quota itself is not
+exposed as a header — check current usage at
+[tapetide.com/settings/tokens](https://tapetide.com/settings/tokens).
 
 ## Troubleshooting
 

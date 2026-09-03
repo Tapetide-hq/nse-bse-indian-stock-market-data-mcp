@@ -1,8 +1,8 @@
 {
   "name": "tapetide-mcp",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "mcpName": "com.tapetide/stock-research-mcp",
-  "description": "NSE BSE Indian stock market MCP server — 34 tools for Indian stock market data & research: live NSE/BSE quotes, financials, technicals, stock screener (326 ratios), analyst ratings, FII/DII flows, IPOs, portfolio tracking & watchlist. Works with Claude, ChatGPT, Cursor, Kiro, Codex & any MCP client.",
+  "description": "NSE BSE Indian stock market MCP server — 52 tools for Indian stock market data & research: live NSE/BSE quotes, financials, technicals, stock screener (326 ratios), analyst ratings, FII/DII flows, option chains & IV, index performance, IPOs, portfolio tracking & watchlist. Works with Claude, ChatGPT, Cursor, Kiro, Codex & any MCP client.",
   "type": "module",
   "bin": {
     "tapetide-mcp": "dist/index.js"
@@ -39,6 +39,10 @@
     "fundamental-analysis",
     "fii-dii",
     "institutional-flows",
+    "option-chain",
+    "implied-volatility",
+    "options-analytics",
+    "backtesting",
     "ipo",
     "mutual-funds",
     "portfolio-tracker",
