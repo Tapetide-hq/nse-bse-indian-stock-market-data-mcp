@@ -13,7 +13,10 @@ on:
 
 jobs:
   build:
-    name: Typecheck & Build
+    # `npm run build` is `tsc`, which typechecks as it emits — a separate
+    # --noEmit pass would just do the same work twice. The `typecheck` script
+    # exists for the faster local loop.
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
