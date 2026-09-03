@@ -101,13 +101,14 @@ For stdio-based MCP clients. No cloning or building required — runs via `npx`:
 └─────────────────┘                           └──────────────────┘                └─────────────────────┘
 ```
 
-The npm package is a lightweight stdio bridge (~300 lines, zero runtime dependencies). It:
+The npm package is a lightweight stdio bridge with zero runtime dependencies. It:
 
 - Reads JSON-RPC from stdin, forwards to the remote Tapetide MCP server, writes responses to stdout
 - Auto-detects framing: Content-Length (VS Code, Claude Desktop) or newline-delimited JSON (Kiro, Claude Code)
 - Exchanges your refresh token for a 1-hour HMAC access token, auto-refreshes before expiry
 - Handles SSE responses from the remote server
-- Warns on stderr when approaching rate limits
+- Identifies your MCP client to the remote via `User-Agent`, and echoes the negotiated protocol version
+- Warns on stderr when the server rate-limits a call, naming the retry delay
 
 All 52 tools and their logic run on the remote server — the npm package is just the transport layer.
 Because it forwards JSON-RPC verbatim, tools shipped on the remote are available immediately without
