@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  # The bridge forwards verbatim, so the remote's catalog can change without any
+  # commit here. A weekly run is what actually catches that drift.
+  schedule:
+    - cron: "0 4 * * 1"
+  workflow_dispatch:
+
+jobs:
+  build:
+    # `npm run build` is `tsc`, which typechecks as it emits — a separate
+    # --noEmit pass would just do the same work twice. The `typecheck` script
+    # exists for the faster local loop.
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+      - run: npm ci
+      - run: npm run build
+
+  catalog-parity:
+    name: README matches live tool catalog
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      # No npm install and no secrets: the script has zero dependencies and
+      # tools/list is public.
+      - run: node scripts/check-catalog-parity.mjs
