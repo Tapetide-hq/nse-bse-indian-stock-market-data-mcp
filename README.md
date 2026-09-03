@@ -128,7 +128,9 @@ Generate a free personal token at [tapetide.com/settings/tokens](https://tapetid
 > Tip: ask your assistant to call `read_me` first. It returns the full in-session guide — every
 > tool by category, usage patterns, and the rules the server expects clients to follow.
 
-<!-- tools:start — the names below are checked against the live server by .github/workflows/catalog-parity.yml. Do not hand-edit the count. -->
+<!-- tools:start — mirrors the server's tool catalog, which is parity-tested against the tools the
+     server actually registers. When the server's catalog changes, regenerate this block; do not
+     hand-edit an individual count. -->
 
 ### 🔍 Discovery & Screening (5 tools)
 
