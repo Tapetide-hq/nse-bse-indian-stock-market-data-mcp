@@ -101,7 +101,7 @@ For stdio-based MCP clients. No cloning or building required — runs via `npx`:
 └─────────────────┘                           └──────────────────┘                └─────────────────────┘
 ```
 
-The npm package is a lightweight stdio bridge (~300 lines, zero runtime dependencies). It:
+The npm package is a lightweight stdio bridge with zero runtime dependencies. It:
 
 - Reads JSON-RPC from stdin, forwards to the remote Tapetide MCP server, writes responses to stdout
 - Auto-detects framing: Content-Length (VS Code, Claude Desktop) or newline-delimited JSON (Kiro, Claude Code)
