@@ -9,6 +9,11 @@
  *   - Content-Length framed (VS Code, Claude Desktop, spec-compliant)
  *   - Newline-delimited JSON (Kiro, Claude Code, some clients)
  *
+ * Identity:
+ *   Forwards the downstream client's name/version (from `initialize`) and the
+ *   negotiated protocol version on every request, so the remote's stateless
+ *   transport can attribute calls instead of seeing an anonymous bridge.
+ *
  * Authentication:
  *   1. Uses TAPETIDE_TOKEN (refresh token) from env
  *   2. Exchanges for 1hr HMAC access token via POST /token
@@ -19,9 +24,27 @@
  * Design Log #035
  */
 
+import { createRequire } from "node:module";
+
 const MCP_URL = process.env.TAPETIDE_MCP_URL || "https://mcp.tapetide.com";
 const REFRESH_TOKEN = process.env.TAPETIDE_TOKEN;
 const DEBUG = process.env.TAPETIDE_DEBUG === "1";
+
+/**
+ * Our own version, read from the package manifest rather than duplicated as a
+ * literal — a hardcoded copy is exactly the kind of drift this bridge already
+ * suffers from. npm always ships package.json in the tarball, and the compiled
+ * entrypoint lives at dist/index.js, so `../package.json` resolves in both the
+ * published package and a local build.
+ */
+const BRIDGE_VERSION: string = (() => {
+  try {
+    const pkg = createRequire(import.meta.url)("../package.json") as { version?: string };
+    return pkg.version ?? "unknown";
+  } catch {
+    return "unknown";
+  }
+})();
 
 if (!REFRESH_TOKEN) {
   process.stderr.write(
@@ -43,7 +66,10 @@ async function refreshAccessToken(): Promise<void> {
   refreshPromise = (async () => {
     const res = await fetch(`${MCP_URL}/token`, {
       method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": userAgent(),
+      },
       body: new URLSearchParams({
         grant_type: "refresh_token",
         refresh_token: REFRESH_TOKEN!,
@@ -72,12 +98,103 @@ async function getAccessToken(): Promise<string> {
 
 // ── Remote forwarding ─────────────────────────────────────────────────
 
-const MCP_HEADERS = {
-  "Content-Type": "application/json",
-  Accept: "application/json, text/event-stream",
-};
-
 const REMOTE_TIMEOUT = 30_000; // 30s per request
+
+/**
+ * The downstream MCP client, learned from the `initialize` request's
+ * `clientInfo`, and the protocol version the remote picked in its `initialize`
+ * response.
+ *
+ * WHY WE TRACK THESE
+ * ------------------
+ * The remote transport is stateless, so the only per-call identity it sees is
+ * the `User-Agent`. Left to Node's default the bridge is anonymous, which means
+ * every npm-bridge user collapses into one indistinguishable bucket and the
+ * remote cannot tell a Claude Desktop call from a Cursor one. `clientInfo` is
+ * already on the wire in `initialize`; forwarding it costs nothing.
+ *
+ * The protocol version is read from the RESPONSE, not the request, on purpose:
+ * the remote rejects a version it does not support with a 400, so echoing back
+ * the one it just chose can never introduce a failure the bridge did not have
+ * before.
+ */
+let downstreamClient: string | null = null;
+let negotiatedProtocolVersion: string | null = null;
+
+/** RFC 7230 token chars only — a client name is untrusted input for a header. */
+function sanitizeForHeader(value: string): string {
+  return value.replace(/[^A-Za-z0-9._-]/g, "-").slice(0, 64);
+}
+
+function userAgent(): string {
+  const self = `tapetide-mcp/${BRIDGE_VERSION}`;
+  return downstreamClient ? `${self} (${downstreamClient})` : self;
+}
+
+function remoteHeaders(token: string): Record<string, string> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    Accept: "application/json, text/event-stream",
+    "User-Agent": userAgent(),
+    Authorization: `Bearer ${token}`,
+  };
+  if (negotiatedProtocolVersion) {
+    headers["MCP-Protocol-Version"] = negotiatedProtocolVersion;
+  }
+  return headers;
+}
+
+/** Learn the downstream client's name from the `initialize` request we forward. */
+function captureClientInfo(body: string): void {
+  try {
+    const msg = JSON.parse(body) as {
+      method?: string;
+      params?: { clientInfo?: { name?: string; version?: string } };
+    };
+    if (msg.method !== "initialize") return;
+    const info = msg.params?.clientInfo;
+    if (!info?.name) return;
+    const name = sanitizeForHeader(info.name);
+    downstreamClient = info.version ? `${name}/${sanitizeForHeader(info.version)}` : name;
+  } catch {
+    /* not our concern — the remote validates the payload */
+  }
+}
+
+/** Learn the negotiated protocol version from the remote's `initialize` result. */
+function captureProtocolVersion(responseText: string): void {
+  try {
+    const msg = JSON.parse(responseText) as { result?: { protocolVersion?: string } };
+    const version = msg.result?.protocolVersion;
+    if (typeof version === "string" && version) negotiatedProtocolVersion = version;
+  } catch {
+    /* non-JSON or an error response — nothing to learn */
+  }
+}
+
+/**
+ * Surface rate limiting on stderr.
+ *
+ * The remote deliberately stopped sending `X-RateLimit-Remaining` (it declines
+ * to expose the numeric quota), so the old "N requests remaining" warning keyed
+ * on a header that no longer exists and could never fire. `Retry-After` is only
+ * present when a call was actually denied — by the per-minute burst smoother or
+ * by the daily/monthly plan quota — which makes its presence the signal.
+ *
+ * Note the denial itself arrives as HTTP 200 carrying a JSON-RPC result with
+ * `isError: true`, by design, so the assistant relays the message instead of
+ * retrying. This warning is for the human watching the logs.
+ */
+function warnOnRateLimit(res: Response): void {
+  const retryAfter = res.headers.get("Retry-After");
+  if (retryAfter === null) return;
+  const seconds = parseInt(retryAfter, 10);
+  const when = Number.isFinite(seconds) ? `${seconds}s` : "shortly";
+  process.stderr.write(
+    `Warning: Tapetide rate limit reached — request denied. Retry in ${when}. ` +
+      `Check usage at https://tapetide.com/settings/tokens\n`,
+  );
+}
 
 async function forwardToRemote(body: string): Promise<string> {
   const token = await getAccessToken();
@@ -85,9 +202,12 @@ async function forwardToRemote(body: string): Promise<string> {
   let method: string | undefined;
   try { method = (JSON.parse(body) as { method?: string }).method; } catch { /* ignore */ }
 
+  // Must run BEFORE the request so the initialize call itself carries identity.
+  if (method === "initialize") captureClientInfo(body);
+
   let res = await fetchWithTimeout(`${MCP_URL}/mcp`, {
     method: "POST",
-    headers: { ...MCP_HEADERS, Authorization: `Bearer ${token}` },
+    headers: remoteHeaders(token),
     body,
   });
 
@@ -97,32 +217,25 @@ async function forwardToRemote(body: string): Promise<string> {
     const freshToken = await getAccessToken();
     res = await fetchWithTimeout(`${MCP_URL}/mcp`, {
       method: "POST",
-      headers: { ...MCP_HEADERS, Authorization: `Bearer ${freshToken}` },
+      headers: remoteHeaders(freshToken),
       body,
     });
   }
 
-  // Warn when approaching rate limits.
-  const remaining = res.headers.get("X-RateLimit-Remaining");
-  if (remaining !== null) {
-    const rem = parseInt(remaining, 10);
-    if (rem === 0) {
-      const resetAt = res.headers.get("X-RateLimit-Reset");
-      process.stderr.write(`Warning: Rate limit exhausted. Resets at ${resetAt ? new Date(parseInt(resetAt, 10) * 1000).toISOString() : "unknown"}.\n`);
-    } else if (rem <= 10) {
-      process.stderr.write(`Warning: ${rem} requests remaining before rate limit.\n`);
-    }
-  }
+  warnOnRateLimit(res);
 
   // Handle SSE responses — extract JSON-RPC messages from event stream.
   const contentType = res.headers.get("content-type") || "";
   if (contentType.includes("text/event-stream")) {
     const result = extractJsonFromSSE(await res.text());
+    if (method === "initialize") captureProtocolVersion(result);
     if (DEBUG) process.stderr.write(`[debug] ${method ?? "?"} → SSE ${res.status} (${Date.now() - start}ms)\n`);
     return result;
   }
 
   const text = await res.text();
+
+  if (method === "initialize") captureProtocolVersion(text);
 
   if (DEBUG) process.stderr.write(`[debug] ${method ?? "?"} → ${res.status} (${Date.now() - start}ms)\n`);
 
@@ -265,7 +378,9 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  process.stderr.write("Tapetide Stock Research MCP connected. Waiting for requests...\n");
+  process.stderr.write(
+    `Tapetide Stock Research MCP v${BRIDGE_VERSION} connected. Waiting for requests...\n`,
+  );
 
   // Auto-detect framing from first chunk.
   // Content-Length framed starts with "Content-Length:", newline-delimited starts with "{".
