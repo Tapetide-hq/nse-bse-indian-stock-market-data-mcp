@@ -8,7 +8,7 @@
     "url": "https://github.com/Tapetide-hq/nse-bse-indian-stock-market-data-mcp",
     "source": "github"
   },
-  "version": "1.0.7",
+  "version": "1.0.8",
   "remotes": [
     {
       "type": "streamable-http",
@@ -19,7 +19,7 @@
     {
       "registryType": "npm",
       "identifier": "tapetide-mcp",
-      "version": "1.0.6",
+      "version": "1.0.7",
       "transport": {
         "type": "stdio"
       },
