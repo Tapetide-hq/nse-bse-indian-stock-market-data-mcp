@@ -10,9 +10,11 @@
  *   - Newline-delimited JSON (Kiro, Claude Code, some clients)
  *
  * Identity:
- *   Forwards the downstream client's name/version (from `initialize`) and the
- *   negotiated protocol version on every request, so the remote's stateless
- *   transport can attribute calls instead of seeing an anonymous bridge.
+ *   Forwards the downstream client's name/version (from `initialize`), the
+ *   negotiated protocol version, and the `Mcp-Session-Id` the remote minted at
+ *   `initialize` on every request, so the remote's stateless transport can
+ *   attribute calls to a client and a session instead of seeing an anonymous
+ *   bridge.
  *
  * Authentication:
  *   1. Uses TAPETIDE_TOKEN (refresh token) from env
@@ -121,6 +123,21 @@ const REMOTE_TIMEOUT = 30_000; // 30s per request
 let downstreamClient: string | null = null;
 let negotiatedProtocolVersion: string | null = null;
 
+/**
+ * The `Mcp-Session-Id` the remote mints in its `initialize` response.
+ *
+ * The remote runs a stateless transport, so it does not REQUIRE this header
+ * back — every request works without it. But it is the only thing that lets
+ * the remote tie the `clientInfo` it learned at `initialize` to the tool calls
+ * that follow: the SDK's per-session client identity is keyed on this id, and
+ * the remote measured that clients which never replay it lose that attribution
+ * on every call after the handshake. Replaying it is a header copy on our side
+ * and costs nothing; a remote that stops minting it simply leaves this null.
+ *
+ * A fresh `initialize` replaces it, since the remote will mint a new one.
+ */
+let remoteSessionId: string | null = null;
+
 /** RFC 7230 token chars only — a client name is untrusted input for a header. */
 function sanitizeForHeader(value: string): string {
   return value.replace(/[^A-Za-z0-9._-]/g, "-").slice(0, 64);
@@ -141,7 +158,27 @@ function remoteHeaders(token: string): Record<string, string> {
   if (negotiatedProtocolVersion) {
     headers["MCP-Protocol-Version"] = negotiatedProtocolVersion;
   }
+  if (remoteSessionId) {
+    headers["Mcp-Session-Id"] = remoteSessionId;
+  }
   return headers;
+}
+
+/**
+ * Learn the session id from the remote's `initialize` response headers.
+ *
+ * Read from the RESPONSE only, never invented locally: the remote is the only
+ * party that can mint an id it will recognise. Header values are ASCII by
+ * construction, but the value is still copied through the same character
+ * allow-list as the client name — the header is going straight back on the
+ * wire, and a hostile remote (TAPETIDE_MCP_URL is user-configurable) must not
+ * be able to inject a CR/LF through it.
+ */
+function captureSessionId(res: Response): void {
+  const id = res.headers.get("Mcp-Session-Id");
+  if (!id) return;
+  const clean = id.replace(/[^A-Za-z0-9._~+/=-]/g, "");
+  remoteSessionId = clean || null;
 }
 
 /** Learn the downstream client's name from the `initialize` request we forward. */
@@ -203,7 +240,12 @@ async function forwardToRemote(body: string): Promise<string> {
   try { method = (JSON.parse(body) as { method?: string }).method; } catch { /* ignore */ }
 
   // Must run BEFORE the request so the initialize call itself carries identity.
-  if (method === "initialize") captureClientInfo(body);
+  // A new handshake also drops the previous session: the remote mints a fresh
+  // id for it, and replaying a stale one would misattribute the new session.
+  if (method === "initialize") {
+    captureClientInfo(body);
+    remoteSessionId = null;
+  }
 
   let res = await fetchWithTimeout(`${MCP_URL}/mcp`, {
     method: "POST",
@@ -223,6 +265,7 @@ async function forwardToRemote(body: string): Promise<string> {
   }
 
   warnOnRateLimit(res);
+  if (method === "initialize") captureSessionId(res);
 
   // Handle SSE responses — extract JSON-RPC messages from event stream.
   const contentType = res.headers.get("content-type") || "";

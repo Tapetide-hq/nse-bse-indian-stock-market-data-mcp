@@ -2,13 +2,13 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "com.tapetide/stock-research-mcp",
   "title": "Tapetide — Indian Stock Market (NSE & BSE)",
-  "description": "52 tools for Indian stock markets — NSE & BSE quotes, screener, financials, FII/DII, options",
+  "description": "55 tools for Indian stock markets — NSE & BSE quotes, screener, filings, FII/DII, options",
   "websiteUrl": "https://mcp.tapetide.com/",
   "repository": {
     "url": "https://github.com/Tapetide-hq/nse-bse-indian-stock-market-data-mcp",
     "source": "github"
   },
-  "version": "1.0.8",
+  "version": "1.0.9",
   "remotes": [
     {
       "type": "streamable-http",

@@ -7,7 +7,7 @@
 <h1 align="center">NSE & BSE Indian Stock Market Data MCP Server</h1>
 
 <p align="center">
-  <strong>The Model Context Protocol server for Indian stock markets — 52 tools to search, screen & analyze all 8,200+ NSE and BSE stocks from Claude, ChatGPT, Cursor & any AI assistant</strong>
+  <strong>The Model Context Protocol server for Indian stock markets — 55 tools to search, screen & analyze all 8,200+ NSE and BSE stocks from Claude, ChatGPT, Cursor & any AI assistant</strong>
 </p>
 
 <p align="center">
@@ -21,7 +21,7 @@
 <p align="center">
   <a href="https://tapetide.com/mcp">Documentation</a> •
   <a href="#quick-start">Quick Start</a> •
-  <a href="#tools">52 Tools</a> •
+  <a href="#tools">55 Tools</a> •
   <a href="#example-prompts">Example Prompts</a> •
   <a href="https://www.npmjs.com/package/tapetide-mcp">npm</a>
 </p>
@@ -109,8 +109,10 @@ The npm package is a lightweight stdio bridge with zero runtime dependencies. It
 - Handles SSE responses from the remote server
 - Identifies your MCP client to the remote via `User-Agent`, and echoes the negotiated protocol version
 - Warns on stderr when the server rate-limits a call, naming the retry delay
+- Replays the `Mcp-Session-Id` the server mints at `initialize` on every later request, so the remote can tie a session's calls together
+- Forwards MCP Apps traffic untouched — `resources/list`, `resources/read` and the `_meta.ui` hints on `get_price_history`, `market_heatmap` and `screen_stocks` reach your client exactly as the server sends them
 
-All 52 tools and their logic run on the remote server — the npm package is just the transport layer.
+All 55 tools and their logic run on the remote server — the npm package is just the transport layer.
 Because it forwards JSON-RPC verbatim, tools shipped on the remote are available immediately without
 upgrading this package.
 
@@ -128,6 +130,11 @@ Generate a free personal token at [tapetide.com/settings/tokens](https://tapetid
 
 > Tip: ask your assistant to call `read_me` first. It returns the full in-session guide — every
 > tool by category, usage patterns, and the rules the server expects clients to follow.
+>
+> Three tools carry an interactive view for hosts that support [MCP Apps](https://github.com/modelcontextprotocol/ext-apps)
+> (Claude, Claude Desktop, VS Code Copilot): `get_price_history` renders the price and volume chart,
+> `market_heatmap` the index treemap, and `screen_stocks` the sortable results table. Text-only hosts
+> get the same JSON result with nothing missing.
 
 <!-- tools:start — mirrors the server's tool catalog. Checked against the live server's tools/list by
      scripts/check-catalog-parity.mjs (CI: .github/workflows/ci.yml). When the catalog changes,
@@ -191,6 +198,16 @@ Generate a free personal token at [tapetide.com/settings/tokens](https://tapetid
 | `get_tapetide_score` | The deterministic 0-100 Tapetide Score for one stock with its six pillar sub-scores, band, percentile, data confidence, and any governance caps or red flags. |
 | `screen_tapetide_scores` | Rank and filter the scored universe by band, size bucket, sector, score window, and confidence, with cursor pagination. |
 | `get_earnings_call_summary` | Structured digest of recent earnings-call transcripts and investor presentations — highlights, risks, guidance, headline metrics. |
+
+### 📄 Filing Text (3 tools)
+
+Parsed filings as text — read the annual report or transcript itself, not just a digest.
+
+| Tool | Description |
+|------|-------------|
+| `list_company_documents` | Index of a company's parsed filings — concall transcripts, annual reports, investor presentations, IPO documents — with `doc_id`, period, page count, what is available for each, and links to the PDF and full Markdown. Call this first. |
+| `get_document_summary` | Investor digest of one filing by `doc_id` (or the newest of a `doc_type`): summary, highlights, risks, management guidance, key metrics. Capped at 6k chars; `truncated: true` marks an abridged digest. |
+| `read_document` | The Markdown text of a filing by `doc_id` and page range, with `<!-- page N -->` markers to cite from. At most 12 pages / 24k chars per call; the result names the pages returned and the `next_pages` to fetch. |
 
 ### ⏳ Point-in-Time & Backtest Safety (5 tools)
 
@@ -373,6 +390,7 @@ recover in the same turn — but new integrations should use the replacement dir
 | **Scoring** | Tapetide Score — deterministic 0-100 rating with six pillar sub-scores, band, percentile, data confidence, governance caps |
 | **Point-in-time** | Split/bonus adjustment factors, per-day observation status, as-of index membership, historical symbol/ISIN resolution — for survivorship-bias-aware backtests |
 | **News & Events** | Sentiment-tagged news, corporate actions, filings (annual reports, concall transcripts), AI digests of earnings calls and investor presentations |
+| **Filing text** | Concall transcripts, annual reports, investor presentations and IPO documents parsed to page-addressed Markdown, with per-document summaries and PDF/Markdown download links |
 | **Portfolio** | Live P&L tracking, sector breakdown, broker CSV import (10+ Indian brokers) |
 
 ## Environment Variables
