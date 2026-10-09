@@ -1,0 +1,19 @@
+{
+  "name": "tapetide",
+  "version": "1.0.9",
+  "description": "Indian stock market (NSE & BSE) data and research: 55 tools for live quotes, financials, technicals, a 326-ratio screener, FII/DII flows, option chains & IV, parsed filings, IPOs and portfolio tracking.",
+  "mcpServers": {
+    "tapetide": {
+      "command": "npx",
+      "args": ["-y", "tapetide-mcp"]
+    }
+  },
+  "settings": [
+    {
+      "name": "Tapetide token",
+      "description": "Free personal API token from https://tapetide.com/settings/tokens (starts with tpt_rt_).",
+      "envVar": "TAPETIDE_TOKEN",
+      "sensitive": true
+    }
+  ]
+}
