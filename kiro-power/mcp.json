@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "tapetide": {
+      "command": "npx",
+      "args": ["-y", "tapetide-mcp"],
+      "env": {
+        "TAPETIDE_TOKEN": "${TAPETIDE_TOKEN}"
+      },
+      "disabled": false
+    }
+  }
+}
