@@ -8,7 +8,7 @@
     "url": "https://github.com/Tapetide-hq/nse-bse-indian-stock-market-data-mcp",
     "source": "github"
   },
-  "version": "1.0.10",
+  "version": "1.0.11",
   "remotes": [
     {
       "type": "streamable-http",
