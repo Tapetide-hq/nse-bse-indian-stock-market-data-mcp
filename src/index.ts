@@ -48,13 +48,7 @@ const BRIDGE_VERSION: string = (() => {
   }
 })();
 
-if (!REFRESH_TOKEN) {
-  process.stderr.write(
-    "Error: TAPETIDE_TOKEN environment variable is required.\n" +
-      "Get one at https://tapetide.com/settings/tokens\n",
-  );
-  process.exit(1);
-}
+const TOKEN_HELP = "Get a free token at https://tapetide.com/settings/tokens and set it as TAPETIDE_TOKEN.";
 
 // ── Auth ──────────────────────────────────────────────────────────────
 
@@ -96,6 +90,35 @@ async function refreshAccessToken(): Promise<void> {
 async function getAccessToken(): Promise<string> {
   if (!accessToken || Date.now() >= tokenExpiresAt) await refreshAccessToken();
   return accessToken!;
+}
+
+/**
+ * Why authentication is currently unavailable, or null when it is.
+ *
+ * Without a working token the bridge still starts, in DISCOVERY MODE, instead
+ * of exiting. Clients and registries (Glama's build check, MCP inspectors, a
+ * user who has not pasted a token yet) need `initialize` + `tools/list` to
+ * work before any credential exists, and the remote already serves the
+ * discovery methods anonymously. Exiting at startup turned all of those into
+ * a dead process with nothing but a stderr line to explain it.
+ */
+let authUnavailable: string | null = null;
+
+/** An access token, or null when none can be had (no token set, or refresh failed). */
+async function tryGetAccessToken(): Promise<string | null> {
+  if (!REFRESH_TOKEN) {
+    authUnavailable = `TAPETIDE_TOKEN is not set. ${TOKEN_HELP}`;
+    return null;
+  }
+  try {
+    const token = await getAccessToken();
+    authUnavailable = null;
+    return token;
+  } catch (err) {
+    const reason = err instanceof Error ? err.message : String(err);
+    authUnavailable = `${reason}. Check your TAPETIDE_TOKEN. ${TOKEN_HELP}`;
+    return null;
+  }
 }
 
 // ── Remote forwarding ─────────────────────────────────────────────────
@@ -148,13 +171,13 @@ function userAgent(): string {
   return downstreamClient ? `${self} (${downstreamClient})` : self;
 }
 
-function remoteHeaders(token: string): Record<string, string> {
+function remoteHeaders(token: string | null): Record<string, string> {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     Accept: "application/json, text/event-stream",
     "User-Agent": userAgent(),
-    Authorization: `Bearer ${token}`,
   };
+  if (token) headers.Authorization = `Bearer ${token}`;
   if (negotiatedProtocolVersion) {
     headers["MCP-Protocol-Version"] = negotiatedProtocolVersion;
   }
@@ -233,11 +256,60 @@ function warnOnRateLimit(res: Response): void {
   );
 }
 
+/**
+ * Methods the remote serves without a token. Kept in step with the remote's
+ * own allow-list: exact names, never a prefix, so nothing added later inherits
+ * anonymous access by accident.
+ */
+function isPublicMethod(method: string | undefined): boolean {
+  return (
+    method === "tools/list" ||
+    method === "ping" ||
+    method === "resources/list" ||
+    method === "resources/read" ||
+    method?.startsWith("notifications/") === true
+  );
+}
+
+const SUPPORTED_PROTOCOL_VERSIONS = ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"];
+
+/**
+ * Answer `initialize` locally while in discovery mode. The remote requires a
+ * token for `initialize` (that 401 is what starts OAuth in chat apps), so the
+ * bridge speaks for it, advertising the same capabilities the remote does.
+ */
+function localInitialize(body: string): string {
+  const msg = JSON.parse(body) as { id?: unknown; params?: { protocolVersion?: string } };
+  const requested = msg.params?.protocolVersion;
+  const protocolVersion =
+    requested && SUPPORTED_PROTOCOL_VERSIONS.includes(requested) ? requested : "2025-06-18";
+  negotiatedProtocolVersion = protocolVersion;
+  return JSON.stringify({
+    jsonrpc: "2.0",
+    id: msg.id ?? null,
+    result: {
+      protocolVersion,
+      capabilities: { tools: { listChanged: true }, resources: { listChanged: true } },
+      serverInfo: { name: "tapetide", version: BRIDGE_VERSION },
+      instructions:
+        `Tapetide is running without authentication: tools can be listed but not called. ${authUnavailable}`,
+    },
+  });
+}
+
 async function forwardToRemote(body: string): Promise<string> {
-  const token = await getAccessToken();
   const start = Date.now();
   let method: string | undefined;
   try { method = (JSON.parse(body) as { method?: string }).method; } catch { /* ignore */ }
+
+  const token = await tryGetAccessToken();
+  if (!token) {
+    if (method === "initialize") {
+      captureClientInfo(body);
+      return localInitialize(body);
+    }
+    if (!isPublicMethod(method)) throw new Error(authUnavailable ?? TOKEN_HELP);
+  }
 
   // Must run BEFORE the request so the initialize call itself carries identity.
   // A new handshake also drops the previous session: the remote mints a fresh
@@ -254,7 +326,7 @@ async function forwardToRemote(body: string): Promise<string> {
   });
 
   // If 401, token may have expired between check and request. Retry once.
-  if (res.status === 401) {
+  if (res.status === 401 && token) {
     accessToken = null;
     const freshToken = await getAccessToken();
     res = await fetchWithTimeout(`${MCP_URL}/mcp`, {
@@ -411,14 +483,13 @@ async function main(): Promise<void> {
   process.on("SIGINT", shutdown);
   process.on("SIGTERM", shutdown);
 
-  // Pre-authenticate so first request is fast.
-  try {
-    await refreshAccessToken();
-  } catch (err) {
+  // Pre-authenticate so first request is fast. Failure is not fatal: the
+  // bridge falls back to discovery mode and retries on every later call.
+  if (!(await tryGetAccessToken())) {
     process.stderr.write(
-      `Error: Failed to authenticate. Check your TAPETIDE_TOKEN.\n${err}\n`,
+      `Warning: ${authUnavailable}\n` +
+        "Starting in discovery mode: tools can be listed, but tool calls will return this error.\n",
     );
-    process.exit(1);
   }
 
   process.stderr.write(

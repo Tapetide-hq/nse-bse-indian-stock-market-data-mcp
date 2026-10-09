@@ -443,7 +443,7 @@ exposed as a header — check current usage at
 
 | Problem | Solution |
 |---------|----------|
-| `TAPETIDE_TOKEN environment variable is required` | Add your token to the `env` section of your MCP config |
+| `TAPETIDE_TOKEN is not set` on a tool call | The bridge starts without a token so tools can be listed, but calls need one. Add it to the `env` section of your MCP config |
 | `Token refresh failed (401)` | Token expired. Generate a new one at [tapetide.com/settings/tokens](https://tapetide.com/settings/tokens) |
 | `Rate limit exceeded` | Wait for reset (shown in error) or check usage at [tapetide.com/settings/tokens](https://tapetide.com/settings/tokens) |
 | Server not responding | Ensure Node.js 18+ is installed (`node --version`) |
