@@ -92,6 +92,14 @@ For stdio-based MCP clients. No cloning or building required — runs via `npx`:
 
 > **Node.js 18+** required for the local option. Run `node --version` to check.
 
+### Gemini CLI extension
+
+```bash
+gemini extensions install https://github.com/Tapetide-hq/nse-bse-indian-stock-market-data-mcp
+```
+
+You'll be prompted for your Tapetide token on install.
+
 ### Option 4: Local MCP via Python (uvx / pip)
 
 Same bridge, packaged for Python 3.10+ — [`tapetide-mcp` on PyPI](https://pypi.org/project/tapetide-mcp/) ([source](https://github.com/Tapetide-hq/nse-bse-indian-stock-market-data-mcp-python)):
