@@ -1,8 +1,8 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "com.tapetide/stock-research-mcp",
-  "title": "Tapetide \u2014 Indian Stock Market (NSE & BSE)",
-  "description": "55 tools for Indian stock markets \u2014 NSE & BSE quotes, screener, filings, FII/DII, options",
+  "title": "Tapetide — Indian Stock Market (NSE & BSE)",
+  "description": "55 tools for Indian stock markets — NSE & BSE quotes, screener, filings, FII/DII, options",
   "websiteUrl": "https://tapetide.com/mcp",
   "repository": {
     "url": "https://github.com/Tapetide-hq/nse-bse-indian-stock-market-data-mcp",
@@ -32,6 +32,24 @@
           "name": "TAPETIDE_TOKEN"
         }
       ]
+    },
+    {
+      "registryType": "pypi",
+      "identifier": "tapetide-mcp",
+      "version": "1.0.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "description": "API token from https://tapetide.com/settings/tokens (free, starts with tpt_rt_)",
+          "isRequired": true,
+          "format": "string",
+          "isSecret": true,
+          "name": "TAPETIDE_TOKEN"
+        }
+      ],
+      "runtimeHint": "uvx"
     }
   ]
 }

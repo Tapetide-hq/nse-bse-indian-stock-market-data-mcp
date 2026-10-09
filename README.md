@@ -92,6 +92,24 @@ For stdio-based MCP clients. No cloning or building required — runs via `npx`:
 
 > **Node.js 18+** required for the local option. Run `node --version` to check.
 
+### Option 4: Local MCP via Python (uvx / pip)
+
+Same bridge, packaged for Python 3.10+ — [`tapetide-mcp` on PyPI](https://pypi.org/project/tapetide-mcp/) ([source](https://github.com/Tapetide-hq/nse-bse-indian-stock-market-data-mcp-python)):
+
+```json
+{
+  "mcpServers": {
+    "tapetide": {
+      "command": "uvx",
+      "args": ["tapetide-mcp"],
+      "env": {
+        "TAPETIDE_TOKEN": "your_token_here"
+      }
+    }
+  }
+}
+```
+
 ## How It Works
 
 ```
@@ -440,6 +458,7 @@ Set `TAPETIDE_DEBUG=1` for detailed logging to stderr.
 - **[tapetide.com/mcp](https://tapetide.com/mcp)** — MCP documentation & setup guide
 - **[mcp.tapetide.com](https://mcp.tapetide.com)** — Remote MCP endpoint
 - **[npm: tapetide-mcp](https://www.npmjs.com/package/tapetide-mcp)** — npm package
+- **[PyPI: tapetide-mcp](https://pypi.org/project/tapetide-mcp/)** — Python package ([source](https://github.com/Tapetide-hq/nse-bse-indian-stock-market-data-mcp-python))
 - **[@tapetide_hq](https://x.com/tapetide_hq)** — X (Twitter)
 - **[GitHub](https://github.com/Tapetide-hq/nse-bse-indian-stock-market-data-mcp)** — Source code
 - **[Glama](https://glama.ai/mcp/servers/Tapetide-hq/nse-bse-indian-stock-market-data-mcp)** — MCP directory listing
