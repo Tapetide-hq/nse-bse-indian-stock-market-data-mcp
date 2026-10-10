@@ -100,6 +100,29 @@ gemini extensions install https://github.com/Tapetide-hq/nse-bse-indian-stock-ma
 
 You'll be prompted for your Tapetide token on install.
 
+### Install as a Claude Code plugin
+
+This repo is also a one-plugin Claude Code marketplace. Run these two commands inside Claude Code:
+
+```
+/plugin marketplace add Tapetide-hq/nse-bse-indian-stock-market-data-mcp
+/plugin install tapetide-indian-stock-market@tapetide
+```
+
+On Claude Code 2.1.275 or later, one line does both:
+
+```
+/plugin install tapetide-indian-stock-market --marketplace Tapetide-hq/nse-bse-indian-stock-market-data-mcp
+```
+
+The plugin connects to the remote server at `https://mcp.tapetide.com/mcp`, so there is nothing to install locally. Run `/mcp` and pick `tapetide` to sign in with Google the first time.
+
+Prefer a local stdio server with a personal token instead? Skip the plugin and add the npm package directly ([get a free token](https://tapetide.com/settings/tokens)):
+
+```bash
+claude mcp add tapetide -e TAPETIDE_TOKEN=your_token_here -- npx -y tapetide-mcp
+```
+
 ### Option 4: Local MCP via Python (uvx / pip)
 
 Same bridge, packaged for Python 3.10+ — [`tapetide-mcp` on PyPI](https://pypi.org/project/tapetide-mcp/) ([source](https://github.com/Tapetide-hq/nse-bse-indian-stock-market-data-mcp-python)):
