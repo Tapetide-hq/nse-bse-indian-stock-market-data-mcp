@@ -1,0 +1,21 @@
+{
+  "name": "tapetide-indian-stock-market",
+  "displayName": "Tapetide: Indian Stock Market (NSE & BSE)",
+  "version": "1.0.9",
+  "description": "Indian stock market research for NSE and BSE: live quotes, financials, technicals, a 326-ratio screener, FII/DII flows, option chains, parsed filings, IPOs, and portfolio tracking.",
+  "author": {
+    "name": "Tapetide",
+    "email": "hello@tapetide.com",
+    "url": "https://tapetide.com"
+  },
+  "homepage": "https://tapetide.com/mcp",
+  "repository": "https://github.com/Tapetide-hq/nse-bse-indian-stock-market-data-mcp",
+  "license": "MIT",
+  "keywords": ["mcp", "indian stock market", "nse", "bse", "finance"],
+  "mcpServers": {
+    "tapetide": {
+      "type": "http",
+      "url": "https://mcp.tapetide.com/mcp"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "tapetide",
+  "description": "Tapetide plugins for Claude Code: Indian stock market (NSE & BSE) data and research.",
+  "owner": {
+    "name": "Tapetide",
+    "email": "hello@tapetide.com",
+    "url": "https://tapetide.com"
+  },
+  "plugins": [
+    {
+      "name": "tapetide-indian-stock-market",
+      "source": "./",
+      "description": "Indian stock market research for NSE and BSE: live quotes, financials, technicals, a 326-ratio screener, FII/DII flows, option chains, parsed filings, IPOs, and portfolio tracking.",
+      "category": "finance",
+      "tags": ["mcp", "indian-stock-market", "nse", "bse", "finance", "stock-research"]
+    }
+  ]
+}
