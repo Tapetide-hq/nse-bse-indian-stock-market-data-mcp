@@ -1,0 +1,95 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "tapetide-indian-stock-market",
+  "version": "1.0.0",
+  "description": "Indian stock market research for all ~8,200 NSE and BSE listed companies: live quotes, financials, technical indicators, fundamental and technical screeners, analyst ratings, shareholding, FII/DII flows, index option chains with IV, parsed annual reports and earnings-call transcripts, IPOs, and portfolio and watchlist tracking.",
+  "author": {
+    "name": "Tapetide",
+    "email": "hello@tapetide.com",
+    "url": "https://tapetide.com"
+  },
+  "homepage": "https://tapetide.com/mcp",
+  "repository": "https://github.com/Tapetide-hq/nse-bse-indian-stock-market-data-mcp",
+  "license": "MIT",
+  "keywords": ["stocks", "india", "nse", "bse", "nifty", "sensex", "finance", "stock-screener", "market-data"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Tapetide: Indian Stock Market",
+        "shortDescription": "NSE & BSE stock research",
+        "longDescription": "Tapetide connects ChatGPT to Indian stock market data across all ~8,200 companies listed on NSE and BSE, from Nifty 50 large caps to SME stocks.\n\nWhat you can do:\n- Look up any stock by name, symbol, BSE code or ISIN, including brand names and renamed companies.\n- Get live quotes, valuation ratios and daily or weekly price history with delivery %.\n- Read quarterly and annual P&L, balance sheet and cash flow, with each period stamped by its publication date.\n- Screen stocks on 326 fundamental ratios or on technical indicators such as RSI, MACD, moving averages and Bollinger Bands.\n- Track FII/DII institutional flows, F&O participant positioning, sector allocation and India VIX.\n- Explore index option chains with IV and Greeks, and IV rank for about 556 underlyings.\n- Read annual reports, earnings-call transcripts and investor presentations as text, or get a digest of guidance, risks and key metrics.\n- Check shareholding, mutual fund holdings, analyst ratings and forecasts, bulk and block deals, IPOs and corporate actions.\n- Track your own portfolio and watchlist.\n\nWho it's for: retail investors, analysts and developers researching Indian equities.\n\nLimitations: covers NSE and BSE listed equities and index derivatives only; option chains are end-of-day snapshots for NIFTY, BANKNIFTY, FINNIFTY and MIDCPNIFTY. Sign in with a Google account; a free plan is included (50 tool calls a day). Data is for research and information only and is not investment advice. Tapetide does not place trades or move money.",
+        "developerName": "Tapetide",
+        "category": "Finance",
+        "capabilities": ["Search stocks", "Read quotes and financials", "Screen stocks", "Read filings", "Track portfolio and watchlist"],
+        "websiteURL": "https://tapetide.com/mcp",
+        "supportURL": "https://tapetide.com/contact",
+        "privacyPolicyURL": "https://tapetide.com/privacy",
+        "termsOfServiceURL": "https://tapetide.com/terms",
+        "defaultPrompt": [
+          "Give me a full picture of TCS: financials, valuation and analyst view.",
+          "Find mid-caps with ROE above 15% and debt-to-equity under 0.5.",
+          "What have FIIs and DIIs done in Indian equities this week?"
+        ],
+        "brandColor": "#0EA882",
+        "composerIcon": "./assets/icon.png",
+        "logo": "./assets/logo.png"
+      },
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Resolve a brand name to its stock and return a live quote",
+              "prompt": "What is Zomato's share price right now?",
+              "tools_triggered": "search_stocks, get_stock_quote",
+              "expected_behavior": "Resolves Zomato to its renamed listing ETERNAL and returns the latest price, day change %, volume and 52-week range."
+            },
+            {
+              "description": "Company overview with financials",
+              "prompt": "Give me a full picture of TCS: last 4 quarters of revenue and profit, valuation, and analyst consensus.",
+              "tools_triggered": "get_company_profile, get_financials",
+              "expected_behavior": "Returns TCS sector and business summary, PE/PB/ROE, the last four quarters of revenue and net profit, and the buy/hold/sell consensus, with an investment-advice disclaimer."
+            },
+            {
+              "description": "Fundamental screen",
+              "prompt": "Find stocks with return on equity above 20% and debt to equity below 0.5.",
+              "tools_triggered": "screen_stocks",
+              "expected_behavior": "Returns a ranked list of matching NSE/BSE stocks with the screened ratios shown for each."
+            },
+            {
+              "description": "Institutional flows",
+              "prompt": "What have FIIs and DIIs done in Indian cash markets over the last week?",
+              "tools_triggered": "get_fii_dii_detail",
+              "expected_behavior": "Returns daily FII and DII net buy/sell figures for recent sessions with totals for the period."
+            },
+            {
+              "description": "Read an earnings-call transcript",
+              "prompt": "What guidance did Infosys management give on its latest earnings call?",
+              "tools_triggered": "get_earnings_call_summary",
+              "expected_behavior": "Summarises guidance, highlights and risks from Infosys's most recent earnings-call transcript, naming the period it covers."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Placing a trade is out of scope",
+              "prompt": "Buy 10 shares of Reliance for me now."
+            },
+            {
+              "description": "Personalised buy/sell advice",
+              "prompt": "Tell me exactly which stock to buy today to double my money."
+            },
+            {
+              "description": "Markets outside India",
+              "prompt": "Show me Apple's stock price on NASDAQ."
+            }
+          ]
+        },
+        "demo_recording_url": "https://youtu.be/DLeO8z0wklQ",
+        "commerce": false,
+        "commerce_description": "Tapetide does not sell products or process payments inside ChatGPT."
+      },
+      "publication": {
+        "release_notes": "Initial release: 55 tools for NSE and BSE stock research."
+      }
+    }
+  }
+}
