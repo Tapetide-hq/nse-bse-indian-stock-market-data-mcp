@@ -480,8 +480,8 @@ and this npm bridge) — they follow your plan, not your transport.
 
 | Scope | Free plan | Paid plans |
 |-------|-----------|------------|
-| Per day | 50 tool calls | Per your plan |
-| Per calendar month | 1,000 tool calls | Per your plan (unlimited on enterprise) |
+| Per day | 50 tool calls | Per your plan, see [tapetide.com/pricing](https://tapetide.com/pricing) |
+| Per calendar month | No monthly cap | Per your plan (unlimited on enterprise) |
 | Burst | 60 tool calls per minute | 60 tool calls per minute |
 
 Only **successful tool calls** consume quota. Protocol traffic (`initialize`, `tools/list`) and
