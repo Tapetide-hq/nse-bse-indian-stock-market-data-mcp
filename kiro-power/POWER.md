@@ -1,7 +1,7 @@
 ---
 name: "tapetide-indian-stock-market"
 displayName: "Tapetide — Indian Stock Market (NSE & BSE)"
-description: "Research any of ~8,200 NSE and BSE listed stocks: live quotes, financials, technicals, a 326-ratio screener, analyst ratings, FII/DII flows, option chains with IV, parsed annual reports and concall transcripts, IPOs and portfolio tracking."
+description: "Research about 8,000 NSE and BSE listed stocks: live quotes, financials, technicals, a 326-ratio screener, analyst ratings, FII/DII flows, option chains with IV, parsed annual reports and concall transcripts, IPOs and portfolio tracking."
 version: "1.0.0"
 author: "Tapetide"
 keywords:
@@ -23,14 +23,14 @@ keywords:
 
 # Tapetide — Indian Stock Market (NSE & BSE)
 
-This power connects Kiro to Indian stock market data through the Tapetide MCP server: 55 tools covering every NSE and BSE listed company, from Nifty 50 large caps to SME stocks.
+This power connects Kiro to Indian stock market data through the Tapetide MCP server: 48 tools covering about 8,000 NSE and BSE listed companies, from Nifty 50 large caps to SME stocks.
 
 ## Setup
 
 1. Get a free token at https://tapetide.com/settings/tokens (it starts with `tpt_rt_`).
 2. Set it in your environment as `TAPETIDE_TOKEN`.
 
-The free plan includes 50 tool calls a day, up to 1,000 a month. Without a token the server still starts and lists its tools, but every tool call returns a message explaining how to add one.
+The free plan includes 50 tool calls a day, with no monthly cap. Without a token the server still starts and lists its tools, but every tool call returns a message explaining how to add one.
 
 ## Start every session with `read_me`
 
