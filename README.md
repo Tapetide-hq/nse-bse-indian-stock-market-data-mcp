@@ -7,7 +7,7 @@
 <h1 align="center">Indian Stock Market MCP Server — NSE & BSE Data for Claude, ChatGPT & Cursor</h1>
 
 <p align="center">
-  <strong>The Indian stock market MCP server for NSE and BSE: 55 tools to search, screen and analyze all 8,200+ listed stocks from Claude, ChatGPT, Cursor, VS Code, Codex, Gemini CLI and any MCP client.</strong>
+  <strong>The Indian stock market MCP server for NSE and BSE: 48 tools (55 including aliases) to search, screen and analyze about 8,000 listed stocks from Claude, ChatGPT, Cursor, VS Code, Codex, Gemini CLI and any MCP client.</strong>
 </p>
 
 <p align="center">
@@ -23,7 +23,7 @@
   <a href="https://tapetide.com/mcp">Documentation</a> •
   <a href="#quick-start">Quick Start</a> •
   <a href="#works-with">Client Setup Guides</a> •
-  <a href="#tools">55 Tools</a> •
+  <a href="#tools">48 Tools</a> •
   <a href="#example-prompts">Example Prompts</a> •
   <a href="https://www.npmjs.com/package/tapetide-mcp">npm</a> •
   <a href="https://pypi.org/project/tapetide-mcp/">PyPI</a>
@@ -41,7 +41,7 @@ claude mcp add tapetide -e TAPETIDE_TOKEN=your_token_here -- npx -y tapetide-mcp
 
 Or skip the install entirely and add the remote server URL `https://mcp.tapetide.com/mcp` in claude.ai, ChatGPT, Grok or any client that supports remote MCP. You sign in with Google.
 
-**55 tools** · **8,200+ NSE/BSE stocks** · **Remote (OAuth) or local (npx / uvx)** · **Free tier** · [Setup guides for 16 clients](https://tapetide.com/mcp)
+**48 tools** (55 including aliases) · **about 8,000 NSE/BSE stocks** · **Remote (OAuth) or local (npx / uvx)** · **Free: 50 tool calls a day** · [Setup guides for 16 clients](https://tapetide.com/mcp)
 
 ## Works with
 
@@ -184,7 +184,7 @@ The npm package is a lightweight stdio bridge with zero runtime dependencies. It
 - Replays the `Mcp-Session-Id` the server mints at `initialize` on every later request, so the remote can tie a session's calls together
 - Forwards MCP Apps traffic untouched — `resources/list`, `resources/read` and the `_meta.ui` hints on `get_price_history`, `market_heatmap` and `screen_stocks` reach your client exactly as the server sends them
 
-All 55 tools and their logic run on the remote server — the npm package is just the transport layer.
+All tools and their logic run on the remote server — the npm package is just the transport layer.
 Because it forwards JSON-RPC verbatim, tools shipped on the remote are available immediately without
 upgrading this package.
 
@@ -298,7 +298,7 @@ Requires a connected Tapetide account.
 | Tool | Description |
 |------|-------------|
 | `get_user_portfolio` | Holdings with live prices, absolute and % P&L, invested value, weight, sector, market-cap class. |
-| `add_portfolio_stocks` | Add holdings singly or in bulk, including rows parsed from a broker CSV or screenshot (Zerodha, Groww, Angel One, Dhan, Upstox, 5Paisa, ICICI Direct, Kotak, HDFC Sky, Motilal Oswal). Duplicates merge on a weighted-average price. |
+| `add_portfolio_stocks` | Add holdings singly or in bulk, including rows parsed from a broker CSV or screenshot. Duplicates merge on a weighted-average price. |
 | `update_portfolio_stock` | Update quantity and average price after a top-up or partial sell. |
 | `remove_portfolio_stocks` | Remove holdings from the portfolio. |
 
@@ -446,7 +446,7 @@ recover in the same turn — but new integrations should use the replacement dir
 
 | Category | What's included |
 |----------|----------------|
-| **Stocks** | All NSE + BSE listed companies (~8,200 including SME) |
+| **Stocks** | About 8,000 NSE and BSE listed companies, including SME |
 | **Price data** | Daily OHLCV up to 2,000 days + weekly aggregation + delivery % |
 | **Financials** | Quarterly + annual P&L, balance sheet, cash flow, 50+ ratios |
 | **Screener** | 326 fundamental ratios + real-time technical indicators + cross-field comparisons |
