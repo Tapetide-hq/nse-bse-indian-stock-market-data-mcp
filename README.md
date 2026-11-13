@@ -519,6 +519,15 @@ Set `TAPETIDE_DEBUG=1` for detailed logging to stderr.
 
 <a href="https://glama.ai/mcp/servers/Tapetide-hq/nse-bse-indian-stock-market-data-mcp"><img width="380" src="https://glama.ai/mcp/servers/Tapetide-hq/nse-bse-indian-stock-market-data-mcp/badges/card.svg" alt="nse-bse-indian-stock-market-data-mcp MCP server" /></a>
 
+## Support
+
+- Email: [support@tapetide.com](mailto:support@tapetide.com)
+- Bugs and feature requests: [GitHub issues](https://github.com/Tapetide-hq/nse-bse-indian-stock-market-data-mcp/issues)
+
+## Privacy
+
+Use of the Tapetide MCP server is covered by the [Privacy Policy](https://tapetide.com/privacy) and the [Terms of Service](https://tapetide.com/terms).
+
 ## Contributing
 
 Issues and pull requests are welcome. For bugs, include the error message and your MCP client name/version.
