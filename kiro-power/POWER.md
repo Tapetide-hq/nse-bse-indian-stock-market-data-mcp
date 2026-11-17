@@ -30,7 +30,7 @@ This power connects Kiro to Indian stock market data through the Tapetide MCP se
 1. Get a free token at https://tapetide.com/settings/tokens (it starts with `tpt_rt_`).
 2. Set it in your environment as `TAPETIDE_TOKEN`.
 
-The free plan includes 50 tool calls a day, with no monthly cap. Without a token the server still starts and lists its tools, but every tool call returns a message explaining how to add one.
+The free plan includes 100 tool calls a day for the first 7 days after signup; after that, tool calls need a paid plan. Without a token the server still starts and lists its tools, but every tool call returns a message explaining how to add one.
 
 ## Start every session with `read_me`
 
