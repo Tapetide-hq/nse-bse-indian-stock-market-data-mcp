@@ -41,7 +41,7 @@ claude mcp add tapetide -e TAPETIDE_TOKEN=your_token_here -- npx -y tapetide-mcp
 
 Or skip the install entirely and add the remote server URL `https://mcp.tapetide.com/mcp` in claude.ai, ChatGPT, Grok or any client that supports remote MCP. You sign in with Google.
 
-**48 tools** (55 including aliases) · **about 8,000 NSE/BSE stocks** · **Remote (OAuth) or local (npx / uvx)** · **Free: 50 tool calls a day** · [Setup guides for 16 clients](https://tapetide.com/mcp)
+**48 tools** (55 including aliases) · **about 8,000 NSE/BSE stocks** · **Remote (OAuth) or local (npx / uvx)** · **Free for your first 7 days: 100 tool calls a day** · [Setup guides for 16 clients](https://tapetide.com/mcp)
 
 ## Works with
 
@@ -480,7 +480,8 @@ and this npm bridge) — they follow your plan, not your transport.
 
 | Scope | Free plan | Paid plans |
 |-------|-----------|------------|
-| Per day | 50 tool calls | Per your plan, see [tapetide.com/pricing](https://tapetide.com/pricing) |
+| Per day | 100 tool calls, for the first 7 days after signup | Per your plan, see [tapetide.com/pricing](https://tapetide.com/pricing) |
+| After the first 7 days | Tool calls need a paid plan | No time limit |
 | Per calendar month | No monthly cap | Per your plan (unlimited on enterprise) |
 | Burst | 60 tool calls per minute | 60 tool calls per minute |
 
