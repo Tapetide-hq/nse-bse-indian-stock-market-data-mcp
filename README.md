@@ -248,7 +248,7 @@ Generate a free personal token at [tapetide.com/settings/tokens](https://tapetid
 | `get_market_news` | Market-wide news across categories with sentiment and related symbols. |
 | `get_market_data` | One dispatcher for seven daily feeds via `dataset`: `deals`, `fno_ban`, `deliveries`, `ipo`, `mtf`, `slbm`, `signals`. |
 | `get_ipo` | One IPO in full, by name: timetable through refund, demat credit and listing, lots per category, reserved shares including anchor, the anchor book with lock-in dates, latest bids per category, the unofficial grey market premium, KPIs, financials, and peers. |
-| `market_heatmap` | Every constituent of an index with market cap, PE, PB, returns from 1d to 5y, volume, sector — 16 indices. |
+| `market_heatmap` | Every constituent of an index with market cap, PE, PB, returns from 1d to 5y, volume, sector — 36 indices. |
 | `market_valuations` | Index PE, PB, and dividend yield over time. Up to 20 years. |
 | `get_india_vix` | The India VIX fear gauge — latest level, daily change, recent history. |
 | `get_results_declared` | Companies that filed quarterly results in a time window, newest first, with filing time, revenue, and net profit. Pass up to 500 symbols to check just your own list. |

@@ -89,7 +89,7 @@ assistant to call `read_me` first — it returns the full in-session guide.
 - `get_market_news` — Sentiment-tagged market-wide news
 - `get_market_data` — One dispatcher for seven daily feeds via `dataset`: `deals`, `fno_ban`, `deliveries`, `ipo`, `mtf`, `slbm`, `signals`
 - `get_ipo` — One IPO in full by name: timetable to listing, lots and reserved shares per category, anchor book, latest bids, unofficial grey market premium, KPIs, financials, peers
-- `market_heatmap` — Index constituent heatmap with multi-timeframe changes (16 indices)
+- `market_heatmap` — Index constituent heatmap with multi-timeframe changes (36 indices)
 - `market_valuations` — Index PE/PB/DY over time (up to 20 years)
 - `get_india_vix` — India VIX latest level, change, history
 - `get_results_declared` — Companies that filed quarterly results in a time window, with filing time, revenue and net profit (up to 500 symbols per check)
