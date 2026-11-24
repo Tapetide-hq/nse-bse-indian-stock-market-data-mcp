@@ -11,7 +11,7 @@
     {
       "name": "tapetide-indian-stock-market",
       "source": "./",
-      "description": "Indian stock market research for NSE and BSE: live quotes, financials, technicals, a 326-ratio screener, FII/DII flows, option chains, parsed filings, IPOs, and portfolio tracking.",
+      "description": "Indian stock market research for NSE and BSE: live quotes, financials, technicals, a 346-ratio screener, FII/DII flows, option chains, parsed filings, IPOs, and portfolio tracking.",
       "category": "finance",
       "tags": ["mcp", "indian-stock-market", "nse", "bse", "finance", "stock-research"]
     }

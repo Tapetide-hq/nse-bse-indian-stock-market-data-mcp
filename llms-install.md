@@ -57,16 +57,16 @@ Published on npm as `tapetide-mcp`. No cloning or building required.
 
 The local server is a stdio bridge (~450 lines, zero runtime dependencies). It reads JSON-RPC from stdin, forwards requests to the remote Tapetide API at `https://mcp.tapetide.com/mcp` with token-based auth, and writes responses to stdout. All tool logic runs on the remote server.
 
-## Available Tools (55)
+## Available Tools (62, 69 including aliases)
 
 The bridge forwards JSON-RPC verbatim, so the live list is always `tools/list` on the server. Ask the
 assistant to call `read_me` first — it returns the full in-session guide.
 
 ### Discovery & Screening
 - `search_stocks` — Resolve a company to its symbol by name, symbol, BSE code, or ISIN (brand names and post-rename aliases included)
-- `screen_stocks` — Fundamental screener over 326 ratios with AND/OR logic and cross-field comparisons
+- `screen_stocks` — Fundamental screener over 346 ratios with AND/OR logic and cross-field comparisons
 - `screen_stocks_technical` — Real-time technical screener (RSI, MACD, SMA/EMA crossovers, Bollinger, ADX, volume)
-- `get_screener_ratios` — Search or list the 326-ratio catalog for exact ratio names
+- `get_screener_ratios` — Search or list the 346-ratio catalog for exact ratio names
 - `get_trending_stocks` — Today's top gainers, losers, most-active from the Nifty 500
 
 ### Company Analysis
@@ -75,6 +75,7 @@ assistant to call `read_me` first — it returns the full in-session guide.
 - `get_batch_quotes` — Up to 20 quotes in one call
 - `get_price_history` — Daily/weekly OHLCV with delivery % (up to 2,000 days per call, pageable)
 - `get_financials` — Quarterly + annual P&L, balance sheet, cash flow, ratios, each period stamped with its publication date
+- `get_batch_financials` — One statement section for up to 10 companies in one call, for side-by-side comparison
 - `get_shareholding` — Promoter, FII, DII, public holdings by quarter
 - `get_forecasts` — Analyst EPS/revenue/EBITDA/ROE estimates vs actuals
 - `get_stock_events` — Sentiment-tagged news, corporate actions, filings
@@ -87,11 +88,21 @@ assistant to call `read_me` first — it returns the full in-session guide.
 - `get_fpi_sectors` — FPI sector-wise investment
 - `get_market_news` — Sentiment-tagged market-wide news
 - `get_market_data` — One dispatcher for seven daily feeds via `dataset`: `deals`, `fno_ban`, `deliveries`, `ipo`, `mtf`, `slbm`, `signals`
+- `get_ipo` — One IPO in full by name: timetable to listing, lots and reserved shares per category, anchor book, latest bids, unofficial grey market premium, KPIs, financials, peers
 - `market_heatmap` — Index constituent heatmap with multi-timeframe changes (16 indices)
 - `market_valuations` — Index PE/PB/DY over time (up to 20 years)
 - `get_india_vix` — India VIX latest level, change, history
+- `get_results_declared` — Companies that filed quarterly results in a time window, with filing time, revenue and net profit (up to 500 symbols per check)
+- `get_lender_metrics` — Quarterly bank and NBFC metrics with filing dates: NPA, capital ratios, provisions, deposits, advances, borrowings, computed NIM
 - `get_index_performance` — Rank ~140 NSE indices by return over completed weeks or months
 - `get_index_history` — OHLC level series plus PE/PB/DY for one index
+
+### Mutual Funds
+- `get_mutual_fund` — A scheme by name, scheme code or ISIN: plans, NAV, returns, expense ratio, benchmark, riskometer, exit load, managers, volatility, Sharpe, Sortino
+- `get_mutual_fund_nav_history` — Daily NAV history of one plan, from as early as 1986
+- `get_mutual_fund_portfolio` — A fund's month-end portfolio with summaries, what it bought and sold since an earlier month, and which funds hold a stock
+- `get_debt_securities` — Bonds and money-market paper funds hold, by ISIN: issuer, type, coupon, maturity, latest rating, holder count
+- `screen_mutual_funds` — Rank and filter funds by category, fund house, benchmark, 1/3/5-year returns, expense ratio and AUM, or compare up to 10 schemes
 
 ### Derivatives & Risk
 - `get_option_chain` — Per-strike index option chain with IV, Greeks, OI, max pain, PCR (NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY)
@@ -115,6 +126,7 @@ assistant to call `read_me` first — it returns the full in-session guide.
 - `get_adjustment_factors` — Split/bonus adjustment timeline
 - `get_observation_status` — Per-day reason a price is present or missing
 - `get_index_membership_asof` — Was a stock in an index on a date (present / uncertain / absent / out_of_coverage)
+- `get_stock_index_memberships` — Every tracked index a stock has been in, one row per membership spell
 - `resolve_identifier_asof` — Historical symbol or ISIN to the company that held it on a date
 - `get_identifiers_asof` — Which symbol and ISIN a company traded under on a date
 
@@ -123,11 +135,15 @@ assistant to call `read_me` first — it returns the full in-session guide.
 - `add_portfolio_stocks` — Add stocks (broker CSV rows supported)
 - `update_portfolio_stock` — Update quantity/avg price
 - `remove_portfolio_stocks` — Remove stocks
+- `save_portfolio` — Create a named portfolio, or rename one or make it the default
+- `delete_portfolio` — Delete a whole portfolio with its holdings, after you confirm
 
 ### Watchlist (needs a connected account)
 - `get_watchlist` — All followed stocks
 - `add_to_watchlist` — Follow stocks (idempotent)
 - `remove_from_watchlist` — Unfollow stocks
+- `save_watchlist` — Create a named watchlist, optionally with stocks, or rename one or make it the default
+- `delete_watchlist` — Delete a whole watchlist with its stocks, after you confirm
 
 ### Guide & Aliases
 - `read_me` — The full in-session guide; call it first

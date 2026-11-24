@@ -1,7 +1,7 @@
 ---
 name: "tapetide-indian-stock-market"
 displayName: "Tapetide — Indian Stock Market (NSE & BSE)"
-description: "Research about 8,000 NSE and BSE listed stocks: live quotes, financials, technicals, a 326-ratio screener, analyst ratings, FII/DII flows, option chains with IV, parsed annual reports and concall transcripts, IPOs and portfolio tracking."
+description: "Research about 8,000 NSE and BSE listed stocks: live quotes, financials, technicals, a 346-ratio screener, analyst ratings, FII/DII flows, option chains with IV, parsed annual reports and concall transcripts, IPOs and portfolio tracking."
 version: "1.0.0"
 author: "Tapetide"
 keywords:
@@ -23,7 +23,7 @@ keywords:
 
 # Tapetide — Indian Stock Market (NSE & BSE)
 
-This power connects Kiro to Indian stock market data through the Tapetide MCP server: 48 tools covering about 8,000 NSE and BSE listed companies, from Nifty 50 large caps to SME stocks.
+This power connects Kiro to Indian stock market data through the Tapetide MCP server: 62 tools covering about 8,000 NSE and BSE listed companies, from Nifty 50 large caps to SME stocks.
 
 ## Setup
 
